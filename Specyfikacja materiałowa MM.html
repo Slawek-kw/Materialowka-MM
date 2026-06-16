@@ -64,8 +64,11 @@
         }
 
         .btn-primary { background-color: var(--primary); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
         .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: var(--success-hover); }
         .btn-purple { background-color: var(--purple); }
+        .btn-purple:hover { background-color: var(--purple-hover); }
 
         .form-section { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 25px; }
         .section-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -93,6 +96,45 @@
 
         #print-template { display: none; }
 
+        /* --- PASEK AUTOMATYCZNEGO ŁADOWANIA KATEGORII Z BAZY --- */
+        .package-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            background-color: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .package-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+            margin-right: 5px;
+            text-transform: uppercase;
+        }
+
+        .btn-pkg {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            background-color: #fff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-pkg:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+            background-color: #f0f4ff;
+        }
+
         /* --- MEDIA QUERIES (RESPONSYWNOŚĆ EKRANOWA) --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -108,6 +150,7 @@
             @page { size: A4 portrait; margin: 8mm 10mm 6mm 10mm; }
             body { background: white; padding: 0; color: #000; }
             .app-container { display: none !important; }
+            .no-print { display: none !important; }
             #print-template { display: block !important; width: 100%; font-family: Arial, sans-serif; background: white; }
             .page-break-before { page-break-before: always; }
             .print-page-flex-container { display: flex; flex-direction: column; justify-content: space-between; height: 258mm; box-sizing: border-box; }
@@ -236,6 +279,18 @@
 
         <div class="form-section">
             <div class="section-title">Spis materiałów i narzędzi</div>
+            
+            <div class="package-bar no-print">
+                <span class="package-label">Wgraj całą kategorię:</span>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Wszystkie')">✨ Wszystkie</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Narzędzia ręczne')">🛠️ Narzędzia ręczne</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Narzędzia HVAC')">❄️ Narzędzia HVAC</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Elektronarzędzia')">⚡ Elektronarzędzia</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('BHP')">🦺 BHP</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Materiały')">📦 Materiały</button>
+                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Chemia HVAC')">🧪 Chemia HVAC</button>
+            </div>
+
             <div class="table-responsive-wrapper">
                 <table class="input-table" id="input-table-data">
                     <thead>
@@ -380,6 +435,68 @@
             if (index >= 31) {
                 const lpCell = document.getElementById('lp-cell-' + index);
                 if (lpCell && lpCell.innerText === "—") { lpCell.innerText = index; lpCell.classList.remove('empty-lp'); }
+            }
+        }
+
+        // --- DYNAMICZNY GENERATOR PAKIETÓW Z BAZY DANYCH (ZGODNY Z OPERA MOBILE/DESKTOP) ---
+        function wczytajMaseSprzetuZFilmu(wybranaKategoria) {
+            if (typeof MOJA_BAZA_MATERIALOW === 'undefined' || MOJA_BAZA_MATERIALOW.length === 0) {
+                alert("⚠️ Błąd: Brak dostępu do słownika! Upewnij się, że plik baza_materialow.js znajduje się w tym samym folderze.");
+                return;
+            }
+
+            const czystyFiltr = wybranaKategoria.trim();
+            let przefiltrowanePrzedmioty = [];
+            
+            MOJA_BAZA_MATERIALOW.forEach(item => {
+                const katPrzedmiotu = item.kat ? item.kat.trim() : "Wszystkie";
+                if (czystyFiltr === 'Wszystkie' || katPrzedmiotu === czystyFiltr) {
+                    przefiltrowanePrzedmioty.push(item.name.trim());
+                }
+            });
+
+            if (przefiltrowanePrzedmioty.length === 0) {
+                alert(`ℹ️ W bazie danych nie ma jeszcze żadnych pozycji przypisanych do kategorii "${czystyFiltr}".`);
+                return;
+            }
+
+            // Pobranie aktualnie wpisanych rzeczy, by uniknąć duplikacji w tabeli
+            let aktualnieWpisane = [];
+            for (let i = 1; i <= 55; i++) {
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() !== "") {
+                    aktualnieWpisane.push(poleNazwa.value.trim().toLowerCase());
+                }
+            }
+
+            let licznikWrzutow = 0;
+
+            for (let i = 1; i <= 55; i++) {
+                if (licznikWrzutow >= przefiltrowanePrzedmioty.length) break;
+
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() === "") {
+                    const kandydat = przefiltrowanePrzedmioty[licznikWrzutow];
+                    
+                    if (!aktualnieWpisane.includes(kandydat.toLowerCase())) {
+                        // Jeśli wstrzykujemy do wiersza powyżej 30, aktywujemy go (LP)
+                        if (i >= 31) { activateRow(i); }
+                        
+                        poleNazwa.value = kandydat;
+                        
+                        // Automatyczne załadowanie uwag i J.m.
+                        autoFillUwagi(i);
+                        
+                        aktualnieWpisane.push(kandydat.toLowerCase());
+                    }
+                    licznikWrzutow++;
+                }
+            }
+
+            if (licznikWrzutow > 0) {
+                console.log(`🟢 Pomyślnie załadowano kategorię "${czystyFiltr}". Wstrzyknięto pozycji: ${licznikWrzutow}.`);
+            } else {
+                alert("ℹ️ Brak wolnych wierszy w tabeli lub wszystkie pozycje z tej kategorii są już wpisane.");
             }
         }
 

@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Zarządzania Bazą Narzędzi i Materiałów (Sortowanie A-Z)</title>
+    <title>Panel Zarządzania Bazą Narzędzi i Materiałów</title>
     <style>
         :root {
             --primary: #10b981;
             --primary-hover: #059669;
             --danger: #ef4444;
             --danger-hover: #dc2626;
+            --purple: #8b5cf6;
+            --purple-hover: #7c3aed;
+            --blue: #2563eb;
+            --blue-hover: #1d4ed8;
             --bg-app: #f1f5f9;
             --bg-card: #ffffff;
             --text-main: #0f172a;
@@ -34,7 +38,7 @@
 
         .admin-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 950px;
             background: var(--bg-card);
             padding: 30px;
             border-radius: 12px;
@@ -58,21 +62,67 @@
             color: var(--text-main);
         }
 
-        /* PRZYWRÓCONA ORYGINALNA INSTRUKCJA */
         .admin-instruction {
             background-color: #f8fafc;
-            border-left: 4px solid #2563eb;
+            border-left: 4px solid var(--blue);
             padding: 12px 15px;
             font-size: 13.5px;
             line-height: 1.5;
             color: var(--text-muted);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border-radius: 0 6px 6px 0;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            padding: 12px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+            margin-right: 5px;
+            text-transform: uppercase;
+        }
+
+        .btn-filter {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            background-color: #fff;
+            color: #475569;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            /* Poprawka pod ekrany dotykowe Opery */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .btn-filter:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .btn-filter.active {
+            background-color: var(--blue);
+            color: white;
+            border-color: var(--blue);
         }
 
         .controls-top {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -94,13 +144,14 @@
         .btn-primary:hover { background-color: var(--primary-hover); }
         .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: var(--danger-hover); }
-        
-        .btn-blue { background-color: #2563eb; }
-        .btn-blue:hover { background-color: #1d4ed8; }
+        .btn-blue { background-color: var(--blue); }
+        .btn-blue:hover { background-color: var(--blue-hover); }
+        .btn-purple { background-color: var(--purple); }
+        .btn-purple:hover { background-color: var(--purple-hover); }
 
         .item-row {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 12px;
             align-items: center;
             background: #f8fafc;
@@ -109,8 +160,13 @@
             border: 1px solid #e2e8f0;
         }
 
+        .row-imported {
+            background-color: #f0fdf4 !important;
+            border-color: #bbf7d0 !important;
+        }
+
         .inp-text {
-            flex: 1;
+            flex: 2;
             padding: 10px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -118,11 +174,27 @@
             outline: none;
         }
 
-        .inp-text:focus {
+        .inp-text:focus, .sel-kat:focus {
             border-color: var(--primary);
         }
 
-        /* DOLNY KONTENER NA PRZYCISK DODAWANIA */
+        .sel-kat {
+            flex: 1.2;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            background-color: white;
+            outline: none;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            /* Reset natywnego wyglądu dla poprawnego renderowania w Operze Mobile */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
         .bottom-actions-wrapper {
             margin-top: 20px;
             padding-top: 15px;
@@ -131,13 +203,13 @@
             justify-content: flex-start;
         }
 
-        /* --- RESPONSYWNOŚĆ DLA URZĄDZEŃ MOBILNYCH --- */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             body { padding: 10px; }
             .admin-container { padding: 15px; }
             .admin-header { flex-direction: column; align-items: stretch; text-align: center; }
             .controls-top { flex-direction: column; }
             .item-row { flex-direction: column; align-items: stretch; gap: 8px; }
+            .sel-kat { width: 100%; }
             .btn-del { align-self: flex-end; width: 40px; height: 40px; justify-content: center; }
             .bottom-actions-wrapper .btn { width: 100%; }
         }
@@ -149,12 +221,26 @@
         <div class="admin-header">
             <h1 class="admin-title">Panel Słownika (Sortowanie A-Z)</h1>
             <div class="controls-top">
+                <button class="btn btn-purple" onclick="document.getElementById('spec-file-picker').click()">📥 Importuj pozycje z szablonu JSON</button>
+                <input type="file" id="spec-file-picker" accept=".json" style="display: none;" onchange="importNewItemsFromSpecification(this)">
+                
                 <button class="btn btn-blue" onclick="saveAndDownloadFile()">💾 Zapisz i pobierz plik</button>
             </div>
         </div>
 
         <div class="admin-instruction">
             <strong>Automatyczne sortowanie:</strong> Podczas generowania pliku system sam ułoży wszystkie pozycje alfabetycznie według nazwy. Po pobraniu nadpisz stary plik <strong>baza_materialow.js</strong> w swoim folderze.
+        </div>
+
+        <div class="filter-bar" id="opera-filter-bar">
+            <span class="filter-label">Filtruj widok:</span>
+            <button class="btn-filter active" data-kat="Wszystkie">Wszystkie</button>
+            <button class="btn-filter" data-kat="Narzędzia ręczne">Narzędzia ręczne</button>
+            <button class="btn-filter" data-kat="Narzędzia HVAC">Narzędzia HVAC</button>
+            <button class="btn-filter" data-kat="Elektronarzędzia">Elektronarzędzia</button>
+            <button class="btn-filter" data-kat="BHP">BHP</button>
+            <button class="btn-filter" data-kat="Materiały">Materiały</button>
+            <button class="btn-filter" data-kat="Chemia HVAC">Chemia HVAC</button>
         </div>
 
         <div id="rows-wrapper">
@@ -166,54 +252,169 @@
     </div>
 
     <script src="baza_materialow.js"></script>
+
     <script>
         const container = document.getElementById('rows-wrapper');
+        
+        const DOSTEPNE_KATEGORIE = [
+            "Wszystkie",
+            "Narzędzia ręczne", 
+            "Narzędzia HVAC", 
+            "Elektronarzędzia", 
+            "BHP", 
+            "Materiały", 
+            "Chemia HVAC"
+        ];
 
-        // Sprawdzenie obecności pliku zewnętrznego i wczytanie danych
+        // Dynamiczne i pewne przechwytywanie kliknięć filtra dedykowane silnikowi mobilnej Opery
+        document.getElementById('opera-filter-bar').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('btn-filter')) {
+                const wybranaKategoria = e.target.getAttribute('data-kat').trim();
+                
+                document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                wykonajFiltrowanie(wybranaKategoria);
+            }
+        });
+
+        // Wczytanie bazy danych na ekran
         if (typeof MOJA_BAZA_MATERIALOW !== 'undefined' && MOJA_BAZA_MATERIALOW.length > 0) {
-            MOJA_BAZA_MATERIALOW.forEach(item => { createRowElement(item.name, item.uwagi); });
+            MOJA_BAZA_MATERIALOW.forEach(item => { 
+                const kategoria = item.kat && DOSTEPNE_KATEGORIE.includes(item.kat.trim()) ? item.kat.trim() : "Wszystkie";
+                createRowElement(item.name, item.uwagi, kategoria, false); 
+            });
         } else {
-            // Jeśli baza nie istnieje, stwórz 3 puste linie startowe
-            for (let i = 0; i < 3; i++) { createRowElement("", ""); }
+            for (let i = 0; i < 3; i++) { createRowElement("", "", "Wszystkie", false); }
         }
 
-        function createRowElement(nameVal, uwagiVal) {
+        function createRowElement(nameVal, uwagiVal, katVal, isNewImported = false) {
             const div = document.createElement('div');
-            div.className = 'item-row';
+            div.className = `item-row ${isNewImported ? 'row-imported' : ''}`;
+            
+            let optionsHtml = "";
+            DOSTEPNE_KATEGORIE.forEach(k => {
+                optionsHtml += `<option value="${k}" ${k === katVal ? 'selected' : ''}>${k}</option>`;
+            });
+
             div.innerHTML = `
                 <input type="text" class="inp-text item-name" placeholder="Nazwa przedmiotu..." value="${nameVal}">
-                <input type="text" class="inp-text item-uwagi" placeholder="Domyślne uwagi (np. typ, marka)..." value="${uwagiVal}">
+                <input type="text" class="inp-text item-uwagi" placeholder="Domyślne uwagi (marka, typ)..." value="${uwagiVal}">
+                <select class="sel-kat" title="Kategoria branżowa" onchange="handleDropdownChange(this)">${optionsHtml}</select>
                 <button class="btn btn-danger btn-del" onclick="this.parentElement.remove()" title="Usuń">🗑️</button>
             `;
             container.appendChild(div);
         }
 
-        function addNewRow() { createRowElement("", ""); }
+        function addNewRow() { 
+            const activeFilterBtn = document.querySelector('.btn-filter.active');
+            const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-kat').trim() : "Wszystkie";
+            createRowElement("", "", activeFilter, false); 
+        }
+
+        function handleDropdownChange(selectElement) {
+            const activeFilterBtn = document.querySelector('.btn-filter.active');
+            const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-kat').trim() : "Wszystkie";
+            
+            // Prawidłowe pobranie wartości w Operze Mobile przez jawne wskazanie wybranego indeksu
+            const wyznaczonaWartosc = selectElement.options[selectElement.selectedIndex].value.trim();
+            
+            const row = selectElement.parentElement;
+            if (activeFilter !== 'Wszystkie' && wyznaczonaWartosc !== activeFilter) {
+                row.style.style.display = 'none';
+            }
+        }
+
+        function wykonajFiltrowanie(kategoria) {
+            const czystyFiltr = kategoria.normalize('NFC').trim();
+            const rows = document.querySelectorAll('.item-row');
+            
+            rows.forEach(row => {
+                const selectElement = row.querySelector('.sel-kat');
+                // Pancerne pobranie wartości opcji z uwzględnieniem normalizacji znaków PL pod mobilne przeglądarki
+                const rowKat = selectElement.options[selectElement.selectedIndex].value.normalize('NFC').trim();
+                
+                if (czystyFiltr === 'Wszystkie' || rowKat === czystyFiltr) {
+                    row.style.display = 'flex';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function importNewItemsFromSpecification(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.items || !Array.isArray(data.items)) {
+                        alert("❌ Błąd! Wybrany plik nie zawiera prawidłowej struktury szablonu specyfikacji.");
+                        return;
+                    }
+
+                    let existingNames = [];
+                    document.querySelectorAll('.item-name').forEach(inputField => {
+                        const val = inputField.value.trim().toLowerCase();
+                        if (val !== "") { existingNames.push(val); }
+                    });
+
+                    let addedCount = 0;
+
+                    data.items.forEach(importedItem => {
+                        const importedName = importedItem.nazwa ? importedItem.nazwa.trim() : "";
+                        const importedUwagi = importedItem.uwagi ? importedItem.uwagi.trim() : "";
+
+                        if (importedName !== "" && !existingNames.includes(importedName.toLowerCase())) {
+                            createRowElement(importedName, importedUwagi, "Wszystkie", true); 
+                            existingNames.push(importedName.toLowerCase());
+                            addedCount++;
+                        }
+                    });
+
+                    if (addedCount > 0) {
+                        const allBtn = document.querySelector('.btn-filter[data-kat="Wszystkie"]');
+                        document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+                        if (allBtn) allBtn.classList.add('active');
+                        wykonajFiltrowanie('Wszystkie');
+                        alert(`🟢 Sukces! Wykryto i dopisano do edytora nowości: ${addedCount}.\nNowe pozycje zostały podświetlone na zielono na dole listy i przypisane wstępnie do kategorii 'Wszystkie'.`);
+                    } else {
+                        alert("ℹ️ Informacja: Wszystkie pozycje z tego szablonu znajdują się już w Twoim słowniku.");
+                    }
+
+                } catch(err) {
+                    alert("❌ Błąd! Nie można odczytać pliku szablonu JSON.");
+                }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
 
         function saveAndDownloadFile() {
             const rows = document.querySelectorAll('.item-row');
             let itemsToSave = [];
 
-            // Zbieranie wpisanych wartości z formularza
             rows.forEach(row => {
                 const nameVal = row.querySelector('.item-name').value.trim();
                 const uwagiVal = row.querySelector('.item-uwagi').value.trim();
-                if (nameVal !== "") { itemsToSave.push({ name: nameVal, uwagi: uwagiVal }); }
+                const selectElement = row.querySelector('.sel-kat');
+                const katVal = selectElement.options[selectElement.selectedIndex].value.trim();
+                
+                if (nameVal !== "") { itemsToSave.push({ name: nameVal, uwagi: uwagiVal, kat: katVal }); }
             });
 
-            // Sortowanie alfabetyczne uwzględniające polskie znaki diakrytyczne
             itemsToSave.sort((a, b) => a.name.localeCompare(b.name, 'pl', { sensitivity: 'base' }));
 
-            // Budowanie struktury kodu wynikowego dla pliku baza_materialow.js
             let fileContent = 'const MOJA_BAZA_MATERIALOW = [\n';
             const stringsArray = itemsToSave.map(item => {
                 const safeName = item.name.replace(/"/g, '\\"');
                 const safeUwagi = item.uwagi.replace(/"/g, '\\"');
-                return `    { name: "${safeName}", uwagi: "${safeUwagi}" }`;
+                return `    { name: "${safeName}", uwagi: "${safeUwagi}", kat: "${item.kat}" }`;
             });
             fileContent += stringsArray.join(',\n') + '\n];';
 
-            // Automatyczne pobieranie wygenerowanego pliku
             const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
