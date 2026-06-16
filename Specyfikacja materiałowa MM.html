@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Specyfikacji Materiałowej - MM Kwidzyn (Wersja 1:1 Inteligentna Baza - Poprawiony Układ)</title>
+    <title>Generator Specyfikacji Materiałowej - MM Kwidzyn (Wersja Hurtowa z Usuwaniem)</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -12,6 +12,8 @@
             --success-hover: #059669;
             --purple: #8b5cf6;
             --purple-hover: #7c3aed;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
             --bg-app: #f1f5f9;
             --bg-card: #ffffff;
             --text-main: #0f172a;
@@ -86,8 +88,33 @@
         .table-responsive-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .input-table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; }
         th { background-color: #f1f5f9; color: #334155; font-size: 13px; font-weight: bold; padding: 10px; border: 1px solid var(--border-color); }
-        td { padding: 6px; border: 1px solid var(--border-color); }
-        td input { width: 100%; padding: 8px; border: 1px solid transparent; border-radius: 4px; font-size: 14px; }
+        
+        td { padding: 6px; border: 1px solid var(--border-color); background-color: #f8fafc; transition: background-color 0.2s; }
+        td input { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid transparent; 
+            border-radius: 4px; 
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            background: transparent;
+        }
+
+        tr.has-data td { background-color: #ffffff !important; }
+        tr.has-data td input { font-weight: 700; color: #000000; }
+
+        td input::placeholder { color: #94a3b8 !important; font-weight: 400 !important; font-style: italic; opacity: 1; }
+        td input::-webkit-input-placeholder { color: #94a3b8 !important; font-weight: 400 !important; font-style: italic; }
+        td input::-moz-placeholder { color: #94a3b8 !important; font-weight: 400 !important; font-style: italic; }
+        td input:-ms-input-placeholder { color: #94a3b8 !important; font-weight: 400 !important; font-style: italic; }
+
+        .uwagi-container { display: flex; gap: 6px; align-items: center; width: 100%; }
+        .btn-row-clear {
+            background: none; border: none; font-size: 15px; cursor: pointer; padding: 4px 6px;
+            border-radius: 4px; transition: background 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .btn-row-clear:hover { background-color: #fee2e2; }
 
         .td-center { text-align: center; width: 60px; font-weight: bold; color: #64748b; }
         .td-jm { width: 80px; }
@@ -96,7 +123,6 @@
 
         #print-template { display: none; }
 
-        /* --- PASEK AUTOMATYCZNEGO ŁADOWANIA KATEGORII Z BAZY --- */
         .package-bar {
             display: flex;
             gap: 8px;
@@ -135,7 +161,6 @@
             background-color: #f0f4ff;
         }
 
-        /* --- MEDIA QUERIES (RESPONSYWNOŚĆ EKRANOWA) --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .app-container { padding: 15px; }
@@ -145,7 +170,6 @@
             .btn { width: 100%; justify-content: center; }
         }
 
-        /* --- GEOMETRIA WYDRUKU PDF (NIENARUSZONA - STRUKTURA 1:1 WZÓR.PDF) --- */
         @media print {
             @page { size: A4 portrait; margin: 8mm 10mm 6mm 10mm; }
             body { background: white; padding: 0; color: #000; }
@@ -392,7 +416,7 @@
                 <table class="materials-table"><thead><tr><th style="width: 10mm;">Lp.</th><th style="width: 115mm;">Nazwa materiału/ przedmiotu<br>(marka, typ, rodzaj, nr)</th><th style="width: 15mm;">J.m.</th><th style="width: 18mm;">Ilość</th><th style="width: 32mm;">Uwagi</th></tr></thead><tbody id="p3-table-body"></tbody></table>
                 <div class="info-small">W przypadku braku miejsca wypełnij kolejną dodatkową stronę.</div>
             </div>
-            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telefon: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
+            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telephone: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
         </div>
     </div>
 
@@ -414,21 +438,48 @@
 
         function createRow(index, visibleLp) {
             const tr = document.createElement('tr');
+            tr.id = `row-tr-${index}`;
             tr.innerHTML = `
                 <td class="td-center ${visibleLp === "" ? 'empty-lp' : ''}" id="lp-cell-${index}">${visibleLp === "" ? "—" : visibleLp}</td>
-                <td><input type="text" id="input-nazwa-${index}" list="slownik-materialow" placeholder="${index >= 31 ? 'Kliknij, aby aktywować...' : 'Wpisz przedmiot...'}" onfocus="activateRow(${index})" oninput="autoFillUwagi(${index})"></td>
-                <td class="td-jm"><input type="text" id="input-jm-${index}" placeholder="szt." style="text-align: center;"></td>
-                <td class="td-qty"><input type="text" id="input-qty-${index}" placeholder="1" style="text-align: center;"></td>
-                <td><input type="text" id="input-uwagi-${index}"></td>
+                <td><input type="text" id="input-nazwa-${index}" list="slownik-materialow" placeholder="${index >= 31 ? 'Kliknij, aby aktywować...' : 'Wpisz przedmiot...'}" onfocus="activateRow(${index})" oninput="obslugaZmianyInputu(${index})"></td>
+                <td class="td-jm"><input type="text" id="input-jm-${index}" placeholder="szt." style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
+                <td class="td-qty"><input type="text" id="input-qty-${index}" placeholder="1" style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
+                <td>
+                    <div class="uwagi-container">
+                        <input type="text" id="input-uwagi-${index}" style="flex-grow: 1;" oninput="obslugaZmianyInputu(${index})">
+                        <button type="button" class="btn-row-clear no-print" onclick="clearRowData(${index})" title="Wyczyść pozycję">🗑️</button>
+                    </div>
+                </td>
             `;
             tbodyInput.appendChild(tr);
+        }
+
+        function obslugaZmianyInputu(index) {
+            const nazwa = document.getElementById(`input-nazwa-${index}`).value.trim();
+            const jm = document.getElementById(`input-jm-${index}`).value.trim();
+            const qty = document.getElementById(`input-qty-${index}`).value.trim();
+            const uwagi = document.getElementById(`input-uwagi-${index}`).value.trim();
+            
+            const wierszTr = document.getElementById(`row-tr-${index}`);
+            
+            if (event && event.target && event.target.id === `input-nazwa-${index}`) {
+                autoFillUwagi(index);
+            }
+
+            if (nazwa !== "" || jm !== "" || qty !== "" || uwagi !== "") {
+                wierszTr.classList.add('has-data');
+            } else {
+                wierszTr.classList.remove('has-data');
+            }
         }
 
         function autoFillUwagi(index) {
             const typedName = document.getElementById(`input-nazwa-${index}`).value.trim();
             const uwagiField = document.getElementById(`input-uwagi-${index}`);
             const foundItem = MOJA_BAZA_MATERIALOW.find(item => item.name === typedName);
-            if (foundItem) { uwagiField.value = foundItem.uwagi; }
+            if (foundItem) { 
+                uwagiField.value = foundItem.uwagi; 
+            }
         }
 
         function activateRow(index) {
@@ -438,7 +489,25 @@
             }
         }
 
-        // --- DYNAMICZNY GENERATOR PAKIETÓW Z BAZY DANYCH (ZGODNY Z OPERA MOBILE/DESKTOP) ---
+        function clearRowData(index) {
+            document.getElementById(`input-nazwa-${index}`).value = "";
+            document.getElementById(`input-jm-${index}`).value = "";
+            document.getElementById(`input-qty-${index}`).value = "";
+            document.getElementById(`input-uwagi-${index}`).value = "";
+            
+            const wierszTr = document.getElementById(`row-tr-${index}`);
+            wierszTr.classList.remove('has-data');
+            
+            if (index >= 31) {
+                const lpCell = document.getElementById('lp-cell-' + index);
+                if (lpCell) {
+                    lpCell.innerText = "—";
+                    lpCell.classList.add('empty-lp');
+                }
+            }
+        }
+
+        // --- POPRAWIONA FUNKCJA HURTOWEGO ŁADOWANIA (ELIMINACJA PUSTYCH PÓL) ---
         function wczytajMaseSprzetuZFilmu(wybranaKategoria) {
             if (typeof MOJA_BAZA_MATERIALOW === 'undefined' || MOJA_BAZA_MATERIALOW.length === 0) {
                 alert("⚠️ Błąd: Brak dostępu do słownika! Upewnij się, że plik baza_materialow.js znajduje się w tym samym folderze.");
@@ -451,7 +520,7 @@
             MOJA_BAZA_MATERIALOW.forEach(item => {
                 const katPrzedmiotu = item.kat ? item.kat.trim() : "Wszystkie";
                 if (czystyFiltr === 'Wszystkie' || katPrzedmiotu === czystyFiltr) {
-                    przefiltrowanePrzedmioty.push(item.name.trim());
+                    przefiltrowanePrzedmioty.push(item);
                 }
             });
 
@@ -460,7 +529,7 @@
                 return;
             }
 
-            // Pobranie aktualnie wpisanych rzeczy, by uniknąć duplikacji w tabeli
+            // Spis rzeczy aktualnie wpisanych, by zapobiec dublowaniu
             let aktualnieWpisane = [];
             for (let i = 1; i <= 55; i++) {
                 const poleNazwa = document.getElementById(`input-nazwa-${i}`);
@@ -469,35 +538,49 @@
                 }
             }
 
-            let licznikWrzutow = 0;
+            let licznikPrzedmiotow = 0;
 
+            // Przeszukujemy tabelę w poszukiwaniu wolnych wierszy
             for (let i = 1; i <= 55; i++) {
-                if (licznikWrzutow >= przefiltrowanePrzedmioty.length) break;
+                // Jeśli wgraliśmy już wszystko, co było w wybranej kategorii, kończymy pracę
+                if (licznikPrzedmiotow >= przefiltrowanePrzedmioty.length) break;
 
                 const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                const poleUwagi = document.getElementById(`input-uwagi-${i}`);
+
+                // Warunek: wiersz musi być idealnie pusty
                 if (poleNazwa && poleNazwa.value.trim() === "") {
-                    const kandydat = przefiltrowanePrzedmioty[licznikWrzutow];
                     
-                    if (!aktualnieWpisane.includes(kandydat.toLowerCase())) {
-                        // Jeśli wstrzykujemy do wiersza powyżej 30, aktywujemy go (LP)
-                        if (i >= 31) { activateRow(i); }
+                    // Szukamy najbliższego kandydata z bazy, którego JESZCZE NIE MA na liście specyfikacji
+                    let znalezionyNowy = false;
+                    while (licznikPrzedmiotow < przefiltrowanePrzedmioty.length) {
+                        const kandydat = przefiltrowanePrzedmioty[licznikPrzedmiotow];
                         
-                        poleNazwa.value = kandydat;
+                        if (!aktualnieWpisane.includes(kandydat.name.trim().toLowerCase())) {
+                            // Mamy go! Wstrzykujemy dane
+                            if (i >= 31) { activateRow(i); }
+                            
+                            poleNazwa.value = kandydat.name.trim();
+                            if (poleUwagi) { poleUwagi.value = kandydat.uwagi.trim(); }
+                            
+                            document.getElementById(`row-tr-${i}`).classList.add('has-data');
+                            aktualnieWpisane.push(kandydat.name.trim().toLowerCase());
+                            znalezionyNowy = true;
+                            
+                            licznikPrzedmiotow++; // Przesuwamy wskaźnik bazy na następną pozycję
+                            break; // Przerywamy pętlę while – ten wiersz został poprawnie zajęty
+                        }
                         
-                        // Automatyczne załadowanie uwag i J.m.
-                        autoFillUwagi(i);
-                        
-                        aktualnieWpisane.push(kandydat.toLowerCase());
+                        // Jeśli kandydat już istniał na liście, pomijamy go i sprawdzamy następny bez zmiany wiersza formularza 'i'
+                        licznikPrzedmiotow++;
                     }
-                    licznikWrzutow++;
+                    
+                    // Jeśli pętla while przeszła do końca bazy i nie znalazła nic nowego, kończymy całe wstrzykiwanie
+                    if (!znalezionyNowy) break;
                 }
             }
 
-            if (licznikWrzutow > 0) {
-                console.log(`🟢 Pomyślnie załadowano kategorię "${czystyFiltr}". Wstrzyknięto pozycji: ${licznikWrzutow}.`);
-            } else {
-                alert("ℹ️ Brak wolnych wierszy w tabeli lub wszystkie pozycje z tej kategorii są już wpisane.");
-            }
+            console.log(`🟢 Załadowano kategorię "${czystyFiltr}". Wpisano nowych pozycji: ${licznikPrzedmiotow}`);
         }
 
         function exportTemplateJSON() {
@@ -549,6 +632,10 @@
                             document.getElementById(`input-jm-${i}`).value = item.jm || '';
                             document.getElementById(`input-qty-${i}`).value = item.qty || '';
                             document.getElementById(`input-uwagi-${i}`).value = item.uwagi || '';
+                            
+                            if ((item.nazwa && item.nazwa.trim() !== "") || (item.uwagi && item.uwagi.trim() !== "")) {
+                                document.getElementById(`row-tr-${i}`).classList.add('has-data');
+                            }
                         }
                     });
                     alert("🟢 Kopia zapasowa danych zaimportowana pomyślnie!");
