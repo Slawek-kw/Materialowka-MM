@@ -62,7 +62,6 @@
         .btn-extra { background-color: var(--purple); }
         .btn-editor { background-color: var(--success); }
 
-        /* Instrukcja w stylu kafelków */
         .help-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 10px; }
         .help-box summary { cursor: pointer; font-weight: bold; color: var(--primary); font-size: 15px; outline: none; }
 
@@ -118,25 +117,27 @@
             <summary>📘 Jak przygotować specyfikację? (Instrukcja dla brygady)</summary>
             <div style="margin-top: 15px; line-height: 1.7; color: #475569; font-size: 14px; text-align: left;">
                 
-                <p><b>1. 📄 Główna Specyfikacja (Strona 1-2)</b></p>
+                <p style="margin-bottom: 8px;"><b>1. 📄 Główna Specyfikacja (Moduł podwójnego działania)</b></p>
+                <p style="margin-bottom: 5px; padding-left: 10px;">Górny pasek przycisków branżowych (np. ❄️ HVAC, 🛠️ Ręczne) działa na dwa sposoby:</p>
+                <ul style="margin-bottom: 12px; padding-left: 30px;">
+                    <li><b>Pojedyncze kliknięcie (Filtrowanie):</b> Przycisk podświetla się na niebiesko. Tabela pozostaje pusta, ale lista podpowiedzi w kolumnie "Nazwa" zostaje zablokowana na tej kategorii. Idealne, gdy chcesz ręcznie wybrać tylko kilka rzeczy z danej grupy.</li>
+                    <li><b>Podwójne kliknięcie (Szybki dwuklik):</b> Automatycznie wstrzykuje <u>cały pakiet</u> narzędzi z wybranej branży do wolnych wierszy tabeli na raz.</li>
+                </ul>
                 <ul style="margin-bottom: 15px; padding-left: 20px;">
-                    <li><b>Wypełnianie:</b> Kliknij przycisk branżowy nad tabelą (np. ❄️ HVAC, 🛠️ BHP), aby automatycznie załadować listę sprzętu.</li>
-                    <li><b>Indywidualny wybór:</b> Możesz też klikać w pole "Nazwa" w dowolnym wierszu – z listy rozwijanej wybierz konkretne narzędzie, a system sam uzupełni uwagi (markę/typ).</li>
-                    <li><b>Masowe wklejanie:</b> Wybierz pozycję <code>== WKLEJ WSZYSTKO Z... ==</code>, aby zapełnić wszystkie puste wiersze zestawem narzędzi przypisanych do danej grupy.</li>
-                    <li><b>Usuwanie pozycji:</b> Kliknij 🗑️ na końcu wiersza. Pole zostanie wyczyszczone, a numeracja (LP) automatycznie się zaktualizuje.</li>
+                    <li><b>Znikające podpowiedzi (Blokada błędów):</b> System pilnuje porządku. Jeśli dane narzędzie znajduje się już w tabeli (wpisałeś je ręcznie lub wgrałeś dwuklikiem), automatycznie zniknie ono z listy podpowiedzi. Nie ma możliwości wpisania duplikatu.</li>
+                    <li><b>Czyszczenie pozycji (Kosze 🗑️):</b> Pomyliłeś się? Kliknij kosz na końcu wiersza. Pole zostanie wyczyszczone, przedmiot wróci na listę podpowiedzi, a numeracja LP dla ochrony zaktualizuje się sama.</li>
                 </ul>
 
-                <p><b>2. ➕ Strona Dodatkowa (Załącznik 12a)</b></p>
+                <p style="margin-bottom: 8px;"><b>2. ➕ Strona Dodatkowa (Załącznik 12a)</b></p>
                 <ul style="margin-bottom: 15px; padding-left: 20px;">
-                    <li>Jeśli lista przekracza 55 pozycji, użyj tego modułu, aby wygenerować arkusz "dokładki".</li>
-                    <li>W tym module numeracja Lp. zaczyna się automatycznie od pozycji 56, co pozwala zachować ciągłość dla dużych zleceń serwisowych.</li>
+                    <li>Jeżeli zabierasz potężną ilość materiałów przekraczającą 55 pozycji, otwórz ten moduł.</li>
+                    <li>Generuje on czysty arkusz "dokładki", który pozwala dopisać kolejne pozycje z zachowaniem <u>ręcznej numeracji Lp.</u> (numery od 56 wzwyż wpisujesz samodzielnie), co zapewnia idealną ciągłość dla rewizji na bramie.</li>
                 </ul>
 
-                <p><b>3. 🖨️ Wydruk do PDF:</b></p>
+                <p style="margin-bottom: 8px;"><b>3. 🖨️ Zapis szablonu, poprawki i wydruk PDF</b></p>
                 <ul style="padding-left: 20px;">
-                    <li>Po wypełnieniu kliknij przycisk <b>Generuj i Drukuj</b> na górze strony.</li>
-                    <li>W oknie drukowania przeglądarki wybierz drukarkę: <b>Zapisz jako PDF</b>.</li>
-                    <li><i>Uwaga: System automatycznie ukrywa wszystkie przyciski i kosze przed wydrukiem, dokument będzie gotowy do przekazania na bramę.</i></li>
+                    <li><b>Zapis i możliwość wprowadzenia poprawek:</b> Z wypisywaniem materiałówek bywa różnie. Dlatego po uzupełnieniu danych warto kliknąć <b>Zapisz szablon</b> (.json). Jeśli okaże się, że musisz coś szybko zmienić lub usunąć, nie musisz pisać dokumentu od nowa! Wystarczy wczytać ten szablon z powrotem, nanieść korektę i wydrukować poprawioną wersję.</li>
+                    <li><b>Druk:</b> Kliknij fioletowy przycisk na samej górze. Przeglądarka wykadruje dokument pod wzór fabryczny MM. Wszystkie przyciski sterujące i ikony koszy <u>automatycznie znikną na wydruku</u>, zostawiając czysty dokument.</li>
                 </ul>
             </div>
         </details>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Specyfikacji Materiałowej - MM Kwidzyn (Wersja Hurtowa z Usuwaniem)</title>
+    <title>Generator Specyfikacji Materiałowej - MM Kwidzyn (Wersja Dynamic Datalist)</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -153,13 +153,11 @@
             border: 1px solid #cbd5e1;
             cursor: pointer;
             transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-pkg:hover {
-            border-color: #2563eb;
-            color: #2563eb;
-            background-color: #f0f4ff;
-        }
+        .btn-pkg:hover { border-color: #2563eb; color: #2563eb; }
+        .btn-pkg.active { background-color: #2563eb; color: white; border-color: #2563eb; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -170,6 +168,7 @@
             .btn { width: 100%; justify-content: center; }
         }
 
+        /* --- GEOMETRIA WYDRUKU PDF --- */
         @media print {
             @page { size: A4 portrait; margin: 8mm 10mm 6mm 10mm; }
             body { background: white; padding: 0; color: #000; }
@@ -240,7 +239,7 @@
         <div class="app-header">
             <div>
                 <h1 class="app-title">Generator Specyfikacji Materiałowej</h1>
-                <p class="app-subtitle">Zakład Produkcyjny MM Kwidzyn sp. z o.o. | Kopia Zapasowa JSON</p>
+                <p class="app-subtitle">Zakład Produkcyjny MM Kwidzyn sp. z o.o. | Słownik Inteligentny (Bez Duplikatów)</p>
             </div>
             <div class="header-actions">
                 <button class="btn btn-success" onclick="exportTemplateJSON()">💾 Zapisz szablon</button>
@@ -304,15 +303,15 @@
         <div class="form-section">
             <div class="section-title">Spis materiałów i narzędzi</div>
             
-            <div class="package-bar no-print">
-                <span class="package-label">Wgraj całą kategorię:</span>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Wszystkie')">✨ Wszystkie</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Narzędzia ręczne')">🛠️ Narzędzia ręczne</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Narzędzia HVAC')">❄️ Narzędzia HVAC</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Elektronarzędzia')">⚡ Elektronarzędzia</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('BHP')">🦺 BHP</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Materiały')">📦 Materiały</button>
-                <button type="button" class="btn-pkg" onclick="wczytajMaseSprzetuZFilmu('Chemia HVAC')">🧪 Chemia HVAC</button>
+            <div class="package-bar no-print" id="category-selector-bar">
+                <span class="package-label">Słownik (Klik: Filtr | Dwuklik: Wgraj):</span>
+                <button type="button" class="btn-pkg active" data-kat="Wszystkie">✨ Wszystkie</button>
+                <button type="button" class="btn-pkg" data-kat="Narzędzia ręczne">🛠️ Narzędzia ręczne</button>
+                <button type="button" class="btn-pkg" data-kat="Narzędzia HVAC">❄️ Narzędzia HVAC</button>
+                <button type="button" class="btn-pkg" data-kat="Elektronarzędzia">⚡ Elektronarzędzia</button>
+                <button type="button" class="btn-pkg" data-kat="BHP">🦺 BHP</button>
+                <button type="button" class="btn-pkg" data-kat="Materiały">📦 Materiały</button>
+                <button type="button" class="btn-pkg" data-kat="Chemia HVAC">🧪 Chemia HVAC</button>
             </div>
 
             <div class="table-responsive-wrapper">
@@ -320,7 +319,7 @@
                     <thead>
                         <tr>
                             <th style="width: 70px; text-align: center;">Lp.</th>
-                            <th>Nazwa materiału / przedmiotu (marka, typ, rodzaj, nr seryjny)</th>
+                            <th>Nazwa materiału / przedmiotu (Zacznij pisać...)</th>
                             <th style="width: 100px; text-align: center;">J.m.</th>
                             <th style="width: 110px; text-align: center;">Ilość</th>
                             <th>Uwagi</th>
@@ -332,6 +331,7 @@
         </div>
     </div>
 
+    <!-- STRUKTURY DRUKU PDF -->
     <div id="print-template">
         <div class="print-page-flex-container">
             <div>
@@ -420,19 +420,72 @@
         </div>
     </div>
 
+    <!-- LOGIKA SYSTEMOWA JAVASCRIPT -->
     <script>
         document.getElementById('form-data').valueAsDate = new Date();
         const tbodyInput = document.querySelector('#input-table-data tbody');
         
+        let AKTUALNIE_AKTYWNA_KATEGORIA = "Wszystkie";
+
         if (typeof MOJA_BAZA_MATERIALOW === 'undefined') { window.MOJA_BAZA_MATERIALOW = []; }
 
-        const datalist = document.getElementById('slownik-materialow');
-        MOJA_BAZA_MATERIALOW.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.name;
-            datalist.appendChild(option);
+        // --- OBSŁUGA PRZYCISKÓW BRANŻOWYCH DUAL-LOGIC (KLIK VS DWUKLIK) ---
+        document.querySelectorAll('.btn-pkg').forEach(btn => {
+            let clickTimer = null;
+            
+            btn.addEventListener('click', function(e) {
+                if (clickTimer) clearTimeout(clickTimer);
+                
+                clickTimer = setTimeout(() => {
+                    document.querySelectorAll('.btn-pkg').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    AKTUALNIE_AKTYWNA_KATEGORIA = btn.getAttribute('data-kat').trim();
+                    przebudujDatalistPodKategorie();
+                }, 250);
+            });
+            
+            btn.addEventListener('dblclick', function(e) {
+                if (clickTimer) clearTimeout(clickTimer);
+                
+                document.querySelectorAll('.btn-pkg').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                AKTUALNIE_AKTYWNA_KATEGORIA = btn.getAttribute('data-kat').trim();
+                wczytajMaseSprzetuZFilmu(AKTUALNIE_AKTYWNA_KATEGORIA);
+            });
         });
 
+        // --- INTELIGENTNE I DYNAMICZNE FILTROWANIE DUPLIKATÓW Z LISTY PODPOWIEDZI ---
+        function przebudujDatalistPodKategorie() {
+            const datalist = document.getElementById('slownik-materialow');
+            datalist.innerHTML = ""; 
+
+            // Wyciągamy z tabeli tablicę nazw narzędzi, które użytkownik zdążył już wpisać
+            let aktualnieUzyteNazwy = [];
+            for (let i = 1; i <= 55; i++) {
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() !== "") {
+                    aktualnieUzyteNazwy.push(poleNazwa.value.trim().toLowerCase());
+                }
+            }
+
+            MOJA_BAZA_MATERIALOW.forEach(item => {
+                const katPrzedmiotu = item.kat ? item.kat.trim() : "Wszystkie";
+                const oczyszczonaNazwaSłownika = item.name.trim();
+                
+                // Sprawdzamy czy: pasuje kategoria ORAZ przedmiot nie został jeszcze użyty w tabeli
+                if ((AKTUALNIE_AKTYWNA_KATEGORIA === "Wszystkie" || katPrzedmiotu === AKTUALNIE_AKTYWNA_KATEGORIA) &&
+                    !aktualnieUzyteNazwy.includes(oczyszczonaNazwaSłownika.toLowerCase())) {
+                    
+                    const option = document.createElement('option');
+                    option.value = oczyszczonaNazwaSłownika;
+                    datalist.appendChild(option);
+                }
+            });
+        }
+
+        // Generowanie wierszy roboczych
         for (let i = 1; i <= 30; i++) { createRow(i, i); }
         for (let i = 31; i <= 55; i++) { createRow(i, ""); }
 
@@ -441,7 +494,7 @@
             tr.id = `row-tr-${index}`;
             tr.innerHTML = `
                 <td class="td-center ${visibleLp === "" ? 'empty-lp' : ''}" id="lp-cell-${index}">${visibleLp === "" ? "—" : visibleLp}</td>
-                <td><input type="text" id="input-nazwa-${index}" list="slownik-materialow" placeholder="${index >= 31 ? 'Kliknij, aby aktywować...' : 'Wpisz przedmiot...'}" onfocus="activateRow(${index})" oninput="obslugaZmianyInputu(${index})"></td>
+                <td><input type="text" id="input-nazwa-${index}" list="slownik-materialow" placeholder="${index >= 31 ? 'Kliknij, aby aktywować...' : 'Wpisz przedmiot...'}" onfocus="activateRow(${index})" oninput="autoFillUwagi(${index}); obslugaZmianyInputu(${index})"></td>
                 <td class="td-jm"><input type="text" id="input-jm-${index}" placeholder="szt." style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
                 <td class="td-qty"><input type="text" id="input-qty-${index}" placeholder="1" style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
                 <td>
@@ -462,24 +515,21 @@
             
             const wierszTr = document.getElementById(`row-tr-${index}`);
             
-            if (event && event.target && event.target.id === `input-nazwa-${index}`) {
-                autoFillUwagi(index);
-            }
-
             if (nazwa !== "" || jm !== "" || qty !== "" || uwagi !== "") {
                 wierszTr.classList.add('has-data');
             } else {
                 wierszTr.classList.remove('has-data');
             }
+
+            // DYNAMICZNA AKTUALIZACJA: Ponowne przeliczenie bazy podpowiedzi po wpisaniu tekstu
+            przebudujDatalistPodKategorie();
         }
 
         function autoFillUwagi(index) {
             const typedName = document.getElementById(`input-nazwa-${index}`).value.trim();
             const uwagiField = document.getElementById(`input-uwagi-${index}`);
-            const foundItem = MOJA_BAZA_MATERIALOW.find(item => item.name === typedName);
-            if (foundItem) { 
-                uwagiField.value = foundItem.uwagi; 
-            }
+            const foundItem = MOJA_BAZA_MATERIALOW.find(item => item.name.trim() === typedName);
+            if (foundItem) { uwagiField.value = foundItem.uwagi; }
         }
 
         function activateRow(index) {
@@ -500,17 +550,16 @@
             
             if (index >= 31) {
                 const lpCell = document.getElementById('lp-cell-' + index);
-                if (lpCell) {
-                    lpCell.innerText = "—";
-                    lpCell.classList.add('empty-lp');
-                }
+                if (lpCell) { lpCell.innerText = "—"; lpCell.classList.add('empty-lp'); }
             }
+
+            // DYNAMICZNA AKTUALIZACJA: Przywrócenie usuniętego przedmiotu z powrotem do listy podpowiedzi
+            przebudujDatalistPodKategorie();
         }
 
-        // --- POPRAWIONA FUNKCJA HURTOWEGO ŁADOWANIA (ELIMINACJA PUSTYCH PÓL) ---
         function wczytajMaseSprzetuZFilmu(wybranaKategoria) {
             if (typeof MOJA_BAZA_MATERIALOW === 'undefined' || MOJA_BAZA_MATERIALOW.length === 0) {
-                alert("⚠️ Błąd: Brak dostępu do słownika! Upewnij się, że plik baza_materialow.js znajduje się w tym samym folderze.");
+                alert("⚠️ Błąd: Brak słownika!");
                 return;
             }
 
@@ -524,12 +573,8 @@
                 }
             });
 
-            if (przefiltrowanePrzedmioty.length === 0) {
-                alert(`ℹ️ W bazie danych nie ma jeszcze żadnych pozycji przypisanych do kategorii "${czystyFiltr}".`);
-                return;
-            }
+            if (przefiltrowanePrzedmioty.length === 0) { return; }
 
-            // Spis rzeczy aktualnie wpisanych, by zapobiec dublowaniu
             let aktualnieWpisane = [];
             for (let i = 1; i <= 55; i++) {
                 const poleNazwa = document.getElementById(`input-nazwa-${i}`);
@@ -540,24 +585,18 @@
 
             let licznikPrzedmiotow = 0;
 
-            // Przeszukujemy tabelę w poszukiwaniu wolnych wierszy
             for (let i = 1; i <= 55; i++) {
-                // Jeśli wgraliśmy już wszystko, co było w wybranej kategorii, kończymy pracę
                 if (licznikPrzedmiotow >= przefiltrowanePrzedmioty.length) break;
 
                 const poleNazwa = document.getElementById(`input-nazwa-${i}`);
                 const poleUwagi = document.getElementById(`input-uwagi-${i}`);
 
-                // Warunek: wiersz musi być idealnie pusty
                 if (poleNazwa && poleNazwa.value.trim() === "") {
-                    
-                    // Szukamy najbliższego kandydata z bazy, którego JESZCZE NIE MA na liście specyfikacji
                     let znalezionyNowy = false;
                     while (licznikPrzedmiotow < przefiltrowanePrzedmioty.length) {
                         const kandydat = przefiltrowanePrzedmioty[licznikPrzedmiotow];
                         
                         if (!aktualnieWpisane.includes(kandydat.name.trim().toLowerCase())) {
-                            // Mamy go! Wstrzykujemy dane
                             if (i >= 31) { activateRow(i); }
                             
                             poleNazwa.value = kandydat.name.trim();
@@ -567,20 +606,17 @@
                             aktualnieWpisane.push(kandydat.name.trim().toLowerCase());
                             znalezionyNowy = true;
                             
-                            licznikPrzedmiotow++; // Przesuwamy wskaźnik bazy na następną pozycję
-                            break; // Przerywamy pętlę while – ten wiersz został poprawnie zajęty
+                            licznikPrzedmiotow++;
+                            break;
                         }
-                        
-                        // Jeśli kandydat już istniał na liście, pomijamy go i sprawdzamy następny bez zmiany wiersza formularza 'i'
                         licznikPrzedmiotow++;
                     }
-                    
-                    // Jeśli pętla while przeszła do końca bazy i nie znalazła nic nowego, kończymy całe wstrzykiwanie
                     if (!znalezionyNowy) break;
                 }
             }
-
-            console.log(`🟢 Załadowano kategorię "${czystyFiltr}". Wpisano nowych pozycji: ${licznikPrzedmiotow}`);
+            
+            // DYNAMICZNA AKTUALIZACJA: Po masowym załadowaniu czyścimy datalist z wgranych pozycji
+            przebudujDatalistPodKategorie();
         }
 
         function exportTemplateJSON() {
@@ -638,11 +674,17 @@
                             }
                         }
                     });
+                    
+                    // DYNAMICZNA AKTUALIZACJA: Po wczytaniu pliku aktualizujemy ukrywanie duplikatów
+                    przebudujDatalistPodKategorie();
                     alert("🟢 Kopia zapasowa danych zaimportowana pomyślnie!");
                 } catch(err) { alert("❌ Błąd pliku JSON."); }
             };
             reader.readAsText(file);
         }
+
+        // Pierwsze uruchomienie bazy podpowiedzi
+        przebudujDatalistPodKategorie();
 
         window.onbeforeprint = function() {
             document.getElementById('p1-print-wykonawca').innerText = document.getElementById('form-wykonawca').value;
