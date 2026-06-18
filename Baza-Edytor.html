@@ -3,423 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Zarządzania Bazą Narzędzi i Materiałów</title>
+    <title>Edytor Bazy Materiałowej - MM Kwidzyn</title>
     <style>
         :root {
-            --primary: #10b981;
-            --primary-hover: #059669;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
             --danger: #ef4444;
             --danger-hover: #dc2626;
-            --purple: #8b5cf6;
-            --purple-hover: #7c3aed;
-            --blue: #2563eb;
-            --blue-hover: #1d4ed8;
             --bg-app: #f1f5f9;
             --bg-card: #ffffff;
             --text-main: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #64748b;
             --border-color: #cbd5e1;
+            --new-item-bg: #e6f4ea; /* Kolor zielonego wyróżnienia dla nowości */
+            --new-item-border: #34a853;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
             background-color: var(--bg-app);
             color: var(--text-main);
-            padding: 30px;
-            display: flex;
-            justify-content: center;
+            padding: 30px 15px;
         }
 
-        .admin-container {
+        .editor-container {
             width: 100%;
-            max-width: 950px;
+            max-width: 1100px;
+            margin: 0 auto;
             background: var(--bg-card);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .admin-header {
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+        .editor-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .admin-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .admin-instruction {
-            background-color: #f8fafc;
-            border-left: 4px solid var(--blue);
-            padding: 12px 15px;
-            font-size: 13.5px;
-            line-height: 1.5;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            border-radius: 0 6px 6px 0;
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            border-bottom: 2px solid var(--bg-app);
+            padding-bottom: 20px;
             margin-bottom: 25px;
-            padding: 12px;
-            background-color: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            align-items: center;
         }
 
-        .filter-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #334155;
-            margin-right: 5px;
-            text-transform: uppercase;
-        }
+        .editor-title h1 { font-size: 24px; color: var(--primary); font-weight: 800; }
+        .editor-title p { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
 
-        .btn-filter {
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 20px;
-            background-color: #fff;
-            color: #475569;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
-            /* Poprawka pod ekrany dotykowe Opery */
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        .btn-filter:hover {
-            border-color: var(--blue);
-            color: var(--blue);
-        }
-
-        .btn-filter.active {
-            background-color: var(--blue);
-            color: white;
-            border-color: var(--blue);
-        }
-
-        .controls-top {
+        .controls-panel {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
         .btn {
-            padding: 10px 16px;
-            font-size: 13px;
+            padding: 10px 18px;
+            font-size: 13.5px;
             font-weight: bold;
+            border: none;
             border-radius: 6px;
             cursor: pointer;
-            border: none;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            color: white;
+            gap: 8px;
         }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: var(--success-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: var(--danger-hover); }
+        
+        /* Styl ukrytego inputa do ładowania plików */
+        #file-input { display: none; }
 
-        .btn-primary { background-color: var(--primary); }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-danger { background-color: var(--danger); }
-        .btn-danger:hover { background-color: var(--danger-hover); }
-        .btn-blue { background-color: var(--blue); }
-        .btn-blue:hover { background-color: var(--blue-hover); }
-        .btn-purple { background-color: var(--purple); }
-        .btn-purple:hover { background-color: var(--purple-hover); }
-
-        .item-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            align-items: center;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .row-imported {
-            background-color: #f0fdf4 !important;
-            border-color: #bbf7d0 !important;
-        }
-
-        .inp-text {
-            flex: 2;
-            padding: 10px;
+        /* Tabela edycji słownika */
+        .table-wrapper { overflow-x: auto; max-height: 600px; border: 1px solid var(--border-color); border-radius: 8px; }
+        .dict-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14.5px; }
+        .dict-table th { background: #f8fafc; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border-color); padding: 12px 15px; font-weight: 700; color: var(--text-main); }
+        .dict-table td { padding: 8px 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        
+        .dict-table input, .dict-table select {
+            width: 100%;
+            padding: 8px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 14px;
-            outline: none;
+            background: #ffffff;
         }
+        .dict-table input:focus, .dict-table select:focus { outline: 2px solid var(--primary); }
 
-        .inp-text:focus, .sel-kat:focus {
-            border-color: var(--primary);
+        /* Klasa specjalna dla wyróżnionych NOWYCH pozycji */
+        .is-new-row {
+            background-color: var(--new-item-bg) !important;
+            animation: pulse-border 2s infinite ease-in-out;
         }
+        .is-new-row td { border-bottom: 1px solid var(--new-item-border); border-top: 1px solid var(--new-item-border); }
+        .badge-new { background: var(--new-item-border); color: white; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 4px; text-transform: uppercase; margin-left: 5px; display: inline-block; }
 
-        .sel-kat {
-            flex: 1.2;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 13px;
-            background-color: white;
-            outline: none;
-            font-weight: 600;
-            color: #334155;
-            cursor: pointer;
-            /* Reset natywnego wyglądu dla poprawnego renderowania w Operze Mobile */
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+        /* Style dla Okna Modalnego (Bufor Weryfikacji) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box {
+            background: #ffffff; width: 100%; max-width: 600px;
+            padding: 30px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+            max-height: 85vh; display: flex; flex-direction: column;
+        }
+        .modal-title { font-size: 19px; font-weight: 800; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .modal-body { overflow-y: auto; flex-grow: 1; margin-bottom: 20px; padding-right: 5px; font-size: 14.5px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
+        
+        .verification-card {
+            background: #f8fafc; border: 1px solid var(--border-color);
+            padding: 15px; border-radius: 8px; margin-top: 15px;
+        }
+        .verification-card label { font-weight: 700; font-size: 12px; text-transform: uppercase; color: var(--text-muted); display: block; margin-top: 8px; }
+        .verification-card input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 4px; font-size: 14px; }
+        .counter-badge { background: #fee2e2; color: #ef4444; padding: 2px 8px; font-weight: bold; border-radius: 20px; font-size: 13px; }
 
-        .bottom-actions-wrapper {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .admin-container { padding: 15px; }
-            .admin-header { flex-direction: column; align-items: stretch; text-align: center; }
-            .controls-top { flex-direction: column; }
-            .item-row { flex-direction: column; align-items: stretch; gap: 8px; }
-            .sel-kat { width: 100%; }
-            .btn-del { align-self: flex-end; width: 40px; height: 40px; justify-content: center; }
-            .bottom-actions-wrapper .btn { width: 100%; }
-        }
+        .btn-icon-only { padding: 8px; background: transparent; color: var(--text-muted); border-radius: 4px; }
+        .btn-icon-only:hover { background: #fee2e2; color: var(--danger); }
+        
+        .status-info { font-size: 13.5px; font-weight: 600; margin-left: auto; color: var(--success); }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1 class="admin-title">Panel Słownika (Sortowanie A-Z)</h1>
-            <div class="controls-top">
-                <button class="btn btn-purple" onclick="document.getElementById('spec-file-picker').click()">📥 Importuj pozycje z szablonu JSON</button>
-                <input type="file" id="spec-file-picker" accept=".json" style="display: none;" onchange="importNewItemsFromSpecification(this)">
+    <div class="editor-container">
+        <div class="editor-header">
+            <div class="editor-title">
+                <h1>🛠️ Edytor Prywatnego Słownika i Bazy Narzędzi</h1>
+                <p>Zarządzaj zasobami brygady technicznwji i importuj szablony (.json) bez błędów i duplikatów</p>
+            </div>
+            <a href="Start-Uruchom-Specyfikacje.html" class="btn" style="background:#64748b; color:white; text-decoration:none;">⬅️ Powrót do menu</a>
+        </div>
+
+        <div class="controls-panel">
+            <button class="btn btn-primary" onclick="triggerFileInput()">📥 Importuj Szablon kolegi (.json)</button>
+            <input type="file" id="file-input" accept=".json" onchange="handleFileImport(event)">
+            
+            <button class="btn btn-success" onclick="addNewRow()">➕ Dodaj czysty wiersz</button>
+            <button class="btn btn-danger" style="background:#7c3aed" onclick="exportDictionaryFile()">💾 Eksportuj bazę (baza_materialow.js)</button>
+            
+            <span id="status-display" class="status-info">Wczytano bazę lokalną</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="dict-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Nazwa materiału / narzędzia</th>
+                        <th style="width: 25%;">Kategoria przypisana</th>
+                        <th style="width: 30%;">Domyślne uwagi / producent</th>
+                        <th style="width: 10%; text-align: center;">Akcja</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="verification-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">
+                🔍 Kontrola Nowości z Szablonu <span id="modal-counter" class="counter-badge">0</span>
+            </div>
+            <div class="modal-body">
+                <p id="modal-intro-text">System porównał dane. Wybierz ścieżkę importu elementów:</p>
                 
-                <button class="btn btn-blue" onclick="saveAndDownloadFile()">💾 Zapisz i pobierz plik</button>
+                <div id="single-review-container" style="display:none;">
+                    <div class="verification-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <span style="font-weight:bold; color:var(--primary)" id="review-index-text">Pozycja 1 z 1</span>
+                            <span class="badge-new">Do weryfikacji</span>
+                        </div>
+                        
+                        <label>Nazwa (Popraw literówki bezpośrednio tutaj):</label>
+                        <input type="text" id="review-name" placeholder="Nazwa przedmiotu">
+                        
+                        <label>Kategoria:</label>
+                        <select id="review-kat" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:4px; margin-top:4px;">
+                            <option value="Narzędzia HVAC">Narzędzia HVAC</option>
+                            <option value="Narzędzia ręczne">Narzędzia ręczne</option>
+                            <option value="Elektronarzędzia">Elektronarzędzia</option>
+                            <option value="Materiały i BHP">Materiały i BHP</option>
+                            <option value="Chemia i Płyny">Chemia i Płyny</option>
+                        </select>
+                        
+                        <label>Domyślne uwagi:</label>
+                        <input type="text" id="review-uwagi" placeholder="Brak uwag">
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:15px; justify-content:space-between;">
+                        <button class="btn btn-danger" style="padding:8px 12px;" onclick="rejectCurrentReviewItem()">❌ Odrzuć / Ignoruj</button>
+                        <button class="btn btn-success" style="padding:8px 12px;" onclick="acceptCurrentReviewItem()">✅ Zatwierdź i przejdź dalej</button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="admin-instruction">
-            <strong>Automatyczne sortowanie:</strong> Podczas generowania pliku system sam ułoży wszystkie pozycje alfabetycznie według nazwy. Po pobraniu nadpisz stary plik <strong>baza_materialow.js</strong> w swoim folderze.
-        </div>
-
-        <div class="filter-bar" id="opera-filter-bar">
-            <span class="filter-label">Filtruj widok:</span>
-            <button class="btn-filter active" data-kat="Wszystkie">Wszystkie</button>
-            <button class="btn-filter" data-kat="Narzędzia ręczne">Narzędzia ręczne</button>
-            <button class="btn-filter" data-kat="Narzędzia HVAC">Narzędzia HVAC</button>
-            <button class="btn-filter" data-kat="Elektronarzędzia">Elektronarzędzia</button>
-            <button class="btn-filter" data-kat="BHP">BHP</button>
-            <button class="btn-filter" data-kat="Materiały">Materiały</button>
-            <button class="btn-filter" data-kat="Chemia HVAC">Chemia HVAC</button>
-        </div>
-
-        <div id="rows-wrapper">
+            <div class="modal-footer" id="modal-default-footer">
+                <button class="btn" style="background:#cbd5e1; color:var(--text-main)" onclick="closeModal()">Anuluj import</button>
+                <button class="btn btn-primary" id="btn-mass-add" onclick="executeMassImport()">⚡ Wgraj masowo na górę i podświetl</button>
+                <button class="btn btn-success" id="btn-detailed-review" onclick="startDetailedReview()">📋 Przeglądaj i popraw literówki</button>
             </div>
-
-        <div class="bottom-actions-wrapper">
-            <button class="btn btn-primary" onclick="addNewRow()">➕ Dodaj pozycję</button>
         </div>
     </div>
 
     <script src="baza_materialow.js"></script>
-
     <script>
-        const container = document.getElementById('rows-wrapper');
-        
-        const DOSTEPNE_KATEGORIE = [
-            "Wszystkie",
-            "Narzędzia ręczne", 
-            "Narzędzia HVAC", 
-            "Elektronarzędzia", 
-            "BHP", 
-            "Materiały", 
-            "Chemia HVAC"
-        ];
+        // Tablica robocza obsługująca aktualny stan edytora
+        let JEDNORAZOWY_SLOWNIK_EDYCJI = [];
+        // Bufor dla nowo wykrytych elementów z importu szablonu .json
+        let BUFOR_NOWYCH_POZYCJI = [];
+        let CURRENT_REVIEW_INDEX = 0;
 
-        // Dynamiczne i pewne przechwytywanie kliknięć filtra dedykowane silnikowi mobilnej Opery
-        document.getElementById('opera-filter-bar').addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('btn-filter')) {
-                const wybranaKategoria = e.target.getAttribute('data-kat').trim();
-                
-                document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                wykonajFiltrowanie(wybranaKategoria);
+        // Inicjalizacja bazy danych na starcie aplikacji
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof MOJA_BAZA_MATERIALOW !== 'undefined' && MOJA_BAZA_MATERIALOW.length > 0) {
+                // Kopiujemy bazę do naszej zmiennej roboczej
+                JEDNORAZOWY_SLOWNIK_EDYCJI = JSON.parse(JSON.stringify(MOJA_BAZA_MATERIALOW));
+                updateStatus(`Załadowano pomyślnie ${JEDNORAZOWY_SLOWNIK_EDYCJI.length} pozycji.`);
+            } else {
+                updateStatus("Brak pliku słownika. Rozpoczynasz z czystą bazą.", true);
+                JEDNORAZOWY_SLOWNIK_EDYCJI = [];
             }
+            renderTable();
         });
 
-        // Wczytanie bazy danych na ekran
-        if (typeof MOJA_BAZA_MATERIALOW !== 'undefined' && MOJA_BAZA_MATERIALOW.length > 0) {
-            MOJA_BAZA_MATERIALOW.forEach(item => { 
-                const kategoria = item.kat && DOSTEPNE_KATEGORIE.includes(item.kat.trim()) ? item.kat.trim() : "Wszystkie";
-                createRowElement(item.name, item.uwagi, kategoria, false); 
+        function updateStatus(text, isError = false) {
+            const display = document.getElementById('status-display');
+            display.innerText = text;
+            display.style.color = isError ? "var(--danger)" : "var(--success)";
+        }
+
+        // Renderowanie całej tabeli na ekranie
+        function renderTable() {
+            const tBody = document.getElementById('table-body');
+            tBody.innerHTML = '';
+
+            JEDNORAZOWY_SLOWNIK_EDYCJI.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                if (item._isNew) {
+                    tr.className = 'is-new-row';
+                }
+                tr.id = `dict-row-${index}`;
+
+                tr.innerHTML = `
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <input type="text" value="${item.name || ''}" onchange="updateItemValue(${index}, 'name', this.value)">
+                            ${item._isNew ? '<span class="badge-new">NOWOŚĆ</span>' : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <select onchange="updateItemValue(${index}, 'kat', this.value)">
+                            <option value="Narzędzia HVAC" ${item.kat === 'Narzędzia HVAC' ? 'selected' : ''}>Narzędzia HVAC</option>
+                            <option value="Narzędzia ręczne" ${item.kat === 'Narzędzia ręczne' ? 'selected' : ''}>Narzędzia ręczne</option>
+                            <option value="Elektronarzędzia" ${item.kat === 'Elektronarzędzia' ? 'selected' : ''}>Elektronarzędzia</option>
+                            <option value="Materiały i BHP" ${item.kat === 'Materiały i BHP' ? 'selected' : ''}>Materiały i BHP</option>
+                            <option value="Chemia i Płyny" ${item.kat === 'Chemia i Płyny' ? 'selected' : ''}>Chemia i Płyny</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" value="${item.uwagi || ''}" onchange="updateItemValue(${index}, 'uwagi', this.value)">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-icon-only" onclick="deleteRow(${index})" title="Usuń pozycję z bazy">🗑️</button>
+                    </td>
+                `;
+                tBody.appendChild(tr);
             });
-        } else {
-            for (let i = 0; i < 3; i++) { createRowElement("", "", "Wszystkie", false); }
         }
 
-        function createRowElement(nameVal, uwagiVal, katVal, isNewImported = false) {
-            const div = document.createElement('div');
-            div.className = `item-row ${isNewImported ? 'row-imported' : ''}`;
-            
-            let optionsHtml = "";
-            DOSTEPNE_KATEGORIE.forEach(k => {
-                optionsHtml += `<option value="${k}" ${k === katVal ? 'selected' : ''}>${k}</option>`;
-            });
-
-            div.innerHTML = `
-                <input type="text" class="inp-text item-name" placeholder="Nazwa przedmiotu..." value="${nameVal}">
-                <input type="text" class="inp-text item-uwagi" placeholder="Domyślne uwagi (marka, typ)..." value="${uwagiVal}">
-                <select class="sel-kat" title="Kategoria branżowa" onchange="handleDropdownChange(this)">${optionsHtml}</select>
-                <button class="btn btn-danger btn-del" onclick="this.parentElement.remove()" title="Usuń">🗑️</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function addNewRow() { 
-            const activeFilterBtn = document.querySelector('.btn-filter.active');
-            const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-kat').trim() : "Wszystkie";
-            createRowElement("", "", activeFilter, false); 
-        }
-
-        function handleDropdownChange(selectElement) {
-            const activeFilterBtn = document.querySelector('.btn-filter.active');
-            const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-kat').trim() : "Wszystkie";
-            
-            // Prawidłowe pobranie wartości w Operze Mobile przez jawne wskazanie wybranego indeksu
-            const wyznaczonaWartosc = selectElement.options[selectElement.selectedIndex].value.trim();
-            
-            const row = selectElement.parentElement;
-            if (activeFilter !== 'Wszystkie' && wyznaczonaWartosc !== activeFilter) {
-                row.style.style.display = 'none';
+        function updateItemValue(index, field, val) {
+            if (JEDNORAZOWY_SLOWNIK_EDYCJI[index]) {
+                JEDNORAZOWY_SLOWNIK_EDYCJI[index][field] = val.trim();
             }
         }
 
-        function wykonajFiltrowanie(kategoria) {
-            const czystyFiltr = kategoria.normalize('NFC').trim();
-            const rows = document.querySelectorAll('.item-row');
-            
-            rows.forEach(row => {
-                const selectElement = row.querySelector('.sel-kat');
-                // Pancerne pobranie wartości opcji z uwzględnieniem normalizacji znaków PL pod mobilne przeglądarki
-                const rowKat = selectElement.options[selectElement.selectedIndex].value.normalize('NFC').trim();
-                
-                if (czystyFiltr === 'Wszystkie' || rowKat === czystyFiltr) {
-                    row.style.display = 'flex';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+        function addNewRow() {
+            // Dodaje czysty element na samą górę dla wygody
+            JEDNORAZOWY_SLOWNIK_EDYCJI.unshift({ name: '', kat: 'Narzędzia ręczne', uwagi: '', _isNew: true });
+            renderTable();
         }
 
-        function importNewItemsFromSpecification(input) {
-            const file = input.files[0];
+        function deleteRow(index) {
+            JEDNORAZOWY_SLOWNIK_EDYCJI.splice(index, 1);
+            renderTable();
+        }
+
+        // Wywołanie kliknięcia ukrytego wyboru plików
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
+
+        // IMPLEMENTACJA INTELIGENTNEGO IMPORU I ANALIZY PLIKU JSON KOLEGI
+        function handleFileImport(event) {
+            const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (!data.items || !Array.isArray(data.items)) {
-                        alert("❌ Błąd! Wybrany plik nie zawiera prawidłowej struktury szablonu specyfikacji.");
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Bezpieczna weryfikacja czy zaimportowany JSON posiada tablicę pozycji 'items'
+                    if (!importedData || !Array.isArray(importedData.items)) {
+                        alert("Błąd: Wybrany plik .json nie jest poprawnym szablonem specyfikacji materiałowej!");
                         return;
                     }
 
-                    let existingNames = [];
-                    document.querySelectorAll('.item-name').forEach(inputField => {
-                        const val = inputField.value.trim().toLowerCase();
-                        if (val !== "") { existingNames.push(val); }
-                    });
+                    // Budujemy listę unikalnych nazw, które już fizycznie mamy w bazie (małe litery w celu wykluczenia powtórzeń)
+                    const obecneNazwyWBazie = JEDNORAZOWY_SLOWNIK_EDYCJI.map(i => i.name.trim().toLowerCase());
+                    
+                    BUFOR_NOWYCH_POZYCJI = [];
 
-                    let addedCount = 0;
-
-                    data.items.forEach(importedItem => {
-                        const importedName = importedItem.nazwa ? importedItem.nazwa.trim() : "";
-                        const importedUwagi = importedItem.uwagi ? importedItem.uwagi.trim() : "";
-
-                        if (importedName !== "" && !existingNames.includes(importedName.toLowerCase())) {
-                            createRowElement(importedName, importedUwagi, "Wszystkie", true); 
-                            existingNames.push(importedName.toLowerCase());
-                            addedCount++;
+                    importedData.items.forEach(item => {
+                        // Importujemy tylko pozycje posiadające fizycznie nazwę i pomijamy puste wiersze szablonu
+                        if (item.nazwa && item.nazwa.trim() !== "") {
+                            const oczyszczonaNazwa = item.nazwa.trim();
+                            
+                            // Kluczowy test: Jeśli nazwy nie ma w bazie, wrzucamy ją do bufora jako nowość do rozpatrzenia
+                            if (!obecneNazwyWBazie.includes(oczyszczonaNazwa.toLowerCase())) {
+                                // Sprawdzamy czy nie duplikuje się również wewnątrz samego bufora
+                                const juzWBuforze = BUFOR_NOWYCH_POZYCJI.some(b => b.name.toLowerCase() === oczyszczonaNazwa.toLowerCase());
+                                if (!juzWBuforze) {
+                                    BUFOR_NOWYCH_POZYCJI.push({
+                                        name: oczyszczonaNazwa,
+                                        kat: "Narzędzia ręczne", // Domyślna bezpieczna kategoria robocza
+                                        uwagi: item.uwagi ? item.uwagi.trim() : ""
+                                    });
+                                }
+                            }
                         }
                     });
 
-                    if (addedCount > 0) {
-                        const allBtn = document.querySelector('.btn-filter[data-kat="Wszystkie"]');
-                        document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-                        if (allBtn) allBtn.classList.add('active');
-                        wykonajFiltrowanie('Wszystkie');
-                        alert(`🟢 Sukces! Wykryto i dopisano do edytora nowości: ${addedCount}.\nNowe pozycje zostały podświetlone na zielono na dole listy i przypisane wstępnie do kategorii 'Wszystkie'.`);
+                    // Zerowanie wartości inputa, aby można było załadować ten sam plik ponownie w razie potrzeby
+                    event.target.value = '';
+
+                    // Podejmowanie decyzji w zależności od wyniku analizy
+                    if (BUFOR_NOWYCH_POZYCJI.length === 0) {
+                        alert("Analiza zakończona: Wszystkie pozycje z tego szablonu znajdują się już w Twojej bazie! Słownik jest aktualny.");
                     } else {
-                        alert("ℹ️ Informacja: Wszystkie pozycje z tego szablonu znajdują się już w Twoim słowniku.");
+                        // Wywołujemy okno modalne i prezentujemy licznik nowości
+                        openVerificationModal(BUFOR_NOWYCH_POZYCJI.length);
                     }
 
-                } catch(err) {
-                    alert("❌ Błąd! Nie można odczytać pliku szablonu JSON.");
+                } catch (err) {
+                    alert("Błąd krytyczny podczas przetwarzania pliku JSON: " + err.message);
                 }
-                input.value = '';
             };
             reader.readAsText(file);
         }
 
-        function saveAndDownloadFile() {
-            const rows = document.querySelectorAll('.item-row');
-            let itemsToSave = [];
+        // STEROWANIE OKNEM MODALNYM BUFORA
+        function openVerificationModal(count) {
+            document.getElementById('modal-counter').innerText = count;
+            document.getElementById('modal-intro-text').innerHTML = `Wykryto dokładnie <strong>${count} nowe pozycje</strong> w przesłanym szablonie, których brakuje w Twojej bazie słownikowej. Co chcesz z nimi zrobić?`;
+            
+            // Przywracamy domyślny wygląd widoku masowego
+            document.getElementById('single-review-container').style.display = 'none';
+            document.getElementById('modal-default-footer').style.display = 'flex';
+            
+            document.getElementById('verification-modal').classList.add('active');
+        }
 
-            rows.forEach(row => {
-                const nameVal = row.querySelector('.item-name').value.trim();
-                const uwagiVal = row.querySelector('.item-uwagi').value.trim();
-                const selectElement = row.querySelector('.sel-kat');
-                const katVal = selectElement.options[selectElement.selectedIndex].value.trim();
-                
-                if (nameVal !== "") { itemsToSave.push({ name: nameVal, uwagi: uwagiVal, kat: katVal }); }
+        function closeModal() {
+            document.getElementById('verification-modal').classList.remove('active');
+            BUFOR_NOWYCH_POZYCJI = [];
+        }
+
+        // ŚCIEŻKA 1: WYMUSZENIE MASOWEGO DODANIA NA SAMĄ GÓRĘ Z WYRÓŻNIENIEM
+        function executeMassImport() {
+            // Oznaczamy wszystkie elementy z bufora flagą _isNew, aby dostały zielone tło i plakietkę
+            const paczkaDoWrzucenia = BUFOR_NOWYCH_POZYCJI.map(item => {
+                return { ...item, _isNew: true };
             });
 
-            itemsToSave.sort((a, b) => a.name.localeCompare(b.name, 'pl', { sensitivity: 'base' }));
+            // Metoda PREPEND: Wypychamy całą paczkę na sam początek naszej tablicy roboczej bazy
+            JEDNORAZOWY_SLOWNIK_EDYCJI = [...paczkaDoWrzucenia, ...JEDNORAZOWY_SLOWNIK_EDYCJI];
+            
+            renderTable();
+            updateStatus(`Pomyślnie dodano masowo ${paczkaDoWrzucenia.length} nowości na górę tabeli.`);
+            closeModal();
+            
+            // Przewijamy widok na samą górę tabeli, aby od razu zobaczyć zielone nowości
+            document.querySelector('.table-wrapper').scrollTop = 0;
+        }
 
-            let fileContent = 'const MOJA_BAZA_MATERIALOW = [\n';
-            const stringsArray = itemsToSave.map(item => {
-                const safeName = item.name.replace(/"/g, '\\"');
-                const safeUwagi = item.uwagi.replace(/"/g, '\\"');
-                return `    { name: "${safeName}", uwagi: "${safeUwagi}", kat: "${item.kat}" }`;
+        // ŚCIEŻKA 2: PRZEGLĄD LINIA PO LINII (KONTROLA LITERÓWEK)
+        function startDetailedReview() {
+            CURRENT_REVIEW_INDEX = 0;
+            document.getElementById('modal-default-footer').style.display = 'none';
+            document.getElementById('single-review-container').style.display = 'block';
+            showItemInReview();
+        }
+
+        function showItemInReview() {
+            const item = BUFOR_NOWYCH_POZYCJI[CURRENT_REVIEW_INDEX];
+            if (!item) return;
+
+            document.getElementById('review-index-text').innerText = `Pozycja ${CURRENT_REVIEW_INDEX + 1} z ${BUFOR_NOWYCH_POZYCJI.length}`;
+            document.getElementById('review-name').value = item.name;
+            document.getElementById('review-kat').value = item.kat;
+            document.getElementById('review-uwagi').value = item.uwagi;
+        }
+
+        function acceptCurrentReviewItem() {
+            // Pobieramy zmodyfikowane przez użytkownika wartości (w tym poprawione błędy pisowni)
+            const correctedName = document.getElementById('review-name').value.trim();
+            const selectedKat = document.getElementById('review-kat').value;
+            const correctedUwagi = document.getElementById('review-uwagi').value.trim();
+
+            if (correctedName === "") {
+                alert("Nazwa pozycji nie może być pusta!");
+                return;
+            }
+
+            // Sprawdzamy czy po ręcznej korekcie nie zrobił się duplikat z czymś w bazie
+            const duplikatWBazie = JEDNORAZOWY_SLOWNIK_EDYCJI.some(i => i.name.toLowerCase() === correctedName.toLowerCase());
+
+            if (!duplikatWBazie) {
+                // Wpychamy zaakceptowaną pozycję na samą górę bazy z flagą podświetlenia
+                JEDNORAZOWY_SLOWNIK_EDYCJI.unshift({
+                    name: correctedName,
+                    kat: selectedKat,
+                    uwagi: correctedUwagi,
+                    _isNew: true
+                });
+            }
+
+            goToNextReviewStep();
+        }
+
+        function rejectCurrentReviewItem() {
+            // Po prostu pomijamy element, nie robiąc nic
+            goToNextReviewStep();
+        }
+
+        function goToNextReviewStep() {
+            CURRENT_REVIEW_INDEX++;
+            if (CURRENT_REVIEW_INDEX < BUFOR_NOWYCH_POZYCJI.length) {
+                showItemInReview();
+            } else {
+                // Koniec paczki bufora weryfikacyjnego
+                alert("Przegląd zakończony! Zmiany zostały naniesione na tabelę edytora.");
+                renderTable();
+                updateStatus("Zakończono szczegółową weryfikację pozycji.");
+                document.getElementById('verification-modal').classList.remove('active');
+                document.querySelector('.table-wrapper').scrollTop = 0;
+            }
+        }
+
+        // GENEROWANIE GOTOWEGO PLIKU STRUKTURALNEGO DO ZAPISU NA DYSK
+        function exportDictionaryFile() {
+            if (JEDNORAZOWY_SLOWNIK_EDYCJI.length === 0) {
+                if (!confirm("Uwaga! Twoja baza jest pusta. Wyeksportowanie wyczyści słownik. Kontynuować?")) return;
+            }
+
+            // Przed zapisem trwale oczyszczamy obiekty ze znaczników tymczasowych wizualizacji '_isNew'
+            const czystaBazaDoZapisu = JEDNORAZOWY_SLOWNIK_EDYCJI.map(item => {
+                const copy = { ...item };
+                delete copy._isNew;
+                return copy;
             });
-            fileContent += stringsArray.join(',\n') + '\n];';
 
-            const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", "baza_materialow.js");
-            link.click();
+            // Budujemy tekst wynikowy pasujący pod standard ładowania skryptów w projekcie
+            const skryptTekst = `// Prywatna baza słownikowa materiałów i sprzętu MM Kwidzyn\nwindow.MOJA_BAZA_MATERIALOW = ${JSON.stringify(czystaBazaDoZapisu, null, 2)};`;
+
+            const blob = new Blob([skryptTekst], { type: "application/javascript;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "baza_materialow.js"; // Stała nazwa wymagana przez pliki huba i generatora
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Odświeżamy tabelę, aby zielone podświetlenia zniknęły, sygnalizując trwałe scalenie z bazą
+            JEDNORAZOWY_SLOWNIK_EDYCJI = czystaBazaDoZapisu;
+            renderTable();
+            updateStatus("Baza została pomyślnie wyeksportowana! Zastąp stary plik w folderze.");
         }
     </script>
 </body>

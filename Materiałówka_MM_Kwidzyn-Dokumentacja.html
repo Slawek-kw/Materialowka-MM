@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrukcja i Opis Systemu - Materiałówki MM Kwidzyn</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --purple: #8b5cf6;
+            --dark: #0f172a;
+            --text: #334155;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 40px 20px; line-height: 1.6; }
+        
+        .doc-container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        header { border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { color: var(--dark); font-size: 26px; font-weight: 800; }
+        .subtitle { color: #64748b; font-size: 14px; margin-top: 5px; }
+
+        h2 { color: var(--dark); font-size: 19px; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-top: 35px; margin-bottom: 15px; font-weight: 700; }
+        h3 { color: var(--primary); font-size: 15px; margin-top: 20px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        p { margin-bottom: 15px; font-size: 15px; }
+        ul, ol { margin-bottom: 20px; padding-left: 25px; }
+        li { margin-bottom: 8px; font-size: 15px; }
+        
+        .feature-box { background: #f1f5f9; border-left: 4px solid var(--primary); padding: 15px; border-radius: 4px; margin: 15px 0; }
+        .feature-box strong { color: var(--dark); }
+        
+        .alert-box { background: #f0fdf4; border-left: 4px solid var(--success); padding: 15px; border-radius: 4px; margin: 15px 0; }
+        .alert-box-pink { background: #fdf2f8; border-left: 4px solid var(--purple); padding: 15px; border-radius: 4px; margin: 15px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14.5px; }
+        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        th { background: #f8fafc; font-weight: bold; color: var(--dark); }
+        tr:nth-child(even) { background: #f8fafc; }
+
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div class="doc-container">
+    <header>
+        <h1>📘 Przewodnik po Systemie Materiałówek MM Kwidzyn</h1>
+        <div class="subtitle">Pełny opis działania, automatyki i zarządzania bazą (Wersja Użytkowa — 2026)</div>
+    </header>
+
+    <h2>1. Jak zorganizowany jest system? (Struktura folderu)</h2>
+    <p>Całe narzędzie składa się z kilku plików, które ściśle ze sobą współpracują. Choć uruchamiasz je z internetu (z GitHuba), działają one jak naczynia połączone na Twoim komputerze:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">Nazwa pliku</th>
+                <th>Co to jest i do czego służy?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Start-Uruchom-Specyfikacje.html</strong></td>
+                <td><strong>Centrum dowodzenia (Hub).</strong> Strona startowa. Sprawdza, czy słownik działa i wyświetla skróconą instrukcję dla chłopaków z brygady.</td>
+            </tr>
+            <tr>
+                <td><strong>Specyfikacja materiałowa MM.html</strong></td>
+                <td><strong>Główny generator (Strony 1-3).</strong> To tutaj wpisuje się dane osobowe, auto i wybiera narzędzia. Obsługuje pierwsze 55 pozycji.</td>
+            </tr>
+            <tr>
+                <td><strong>Specyfikacja materiałowa MM - Strona Dodatkowa.html</strong></td>
+                <td><strong>Dokładka (Załącznik 12a).</strong> Czysty arkusz na kolejne 25 pozycji, używany tylko przy potężnych zleceniach (powyżej 55 sztuk).</td>
+            </tr>
+            <tr>
+                <td><strong>Baza-Edytor.html</strong></td>
+                <td><strong>Panel administratora bazy.</strong> Narzędzie dla Ciebie do edycji spisu narzędzi, uwag oraz wgrywania plików od innych osób.</td>
+            </tr>
+            <tr>
+                <td><strong>baza_materialow.js</strong></td>
+                <td><strong>Magazyn (Słownik).</strong> Plik tekstowy, w którym zapisane są wszystkie klucze, mierniki i chemia. Pozostałe strony czytają z niego podpowiedzi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Omówienie sprytnych funkcji (Jak to działa?)</h2>
+    <p>W systemie zaszyto kilka automatycznych mechanizmów, które eliminują nudne przepisywanie i pilnują, by w dokumentach nie było błędów:</p>
+
+    <h3>A. Pasek kategorii: kliknięcie vs. dwuklik (Dual-Logic)</h3>
+    <div class="feature-box">
+        <strong>Pojedyncze kliknięcie (Filtrowanie):</strong> Gdy klikniesz np. przycisk <em>"HVAC"</em> jeden raz, podświetli się on na niebiesko. Tabela pozostanie pusta, ale kiedy klikniesz w pole "Nazwa materiału" w dowolnym wierszu, na liście podpowiedzi zobaczysz <strong>tylko i wyłącznie rzeczy powiązane z HVAC</strong>.
+    </div>
+    <div class="feature-box">
+        <strong>Podwójne kliknięcie (Szybki wrzut):</strong> Gdy zrobisz szybki dwuklik na przycisk kategorii, system automatycznie <strong>wstrzyknie cały dostępny pakiet</strong> tych pozycji do wolnych wierszy tabeli na raz. Oszczędza to czas, gdy zabierasz na obiekt całe standardowe wyposażenie danej branży.
+    </div>
+
+    <h3>B. Mechanizm znikających podpowiedzi (Brak duplikatów)</h3>
+    <p>System na bieżąco pilnuje, aby to samo narzędzie nie zostało wpisane dwa razy:</p>
+    <ul>
+        <li>Jeśli jakaś pozycja (np. <em>Młotek Stanley</em>) znajdzie się już w tabeli — nieważne, czy wpiszesz ją ręcznie, czy wskoczy przez dwuklik — system **natychmiast ukrywa ją na rozwijalnej liście podpowiedzi**.</li>
+        <li>Dzięki temu, klikając w kolejne wiersze, lista podpowiedzi staje się coraz krótsza i nie ma ryzyka, że przez pomyłkę wpiszesz dubel, co mogłoby wywołać niepotrzebne dyskusje na bramie.</li>
+        <li>Jeśli usuniesz pozycję z tabeli za pomocą **ikony kosza (🗑️)**, przedmiot natychmiast wraca na listę podpowiedzi, a wiersz staje się szary i czysty.</li>
+    </ul>
+
+    <h3>C. Szablony (.json) jako ułatwienie poprawek</h3>
+    <p>Z wypisywaniem dokumentów na zakładzie bywa różnie — czasem trzeba coś szybko zmienić. Przycisk <strong>"Zapisz szablon"</strong> pobiera na dysk mały plik tekstowy. Jeśli na bramie okaże się, że musisz wykreślić jedno narzędzie, nie piszesz dokumentu od nowa. Wczytujesz ten plik z powrotem do generatora, klikasz kosz przy niepotrzebnej pozycji i drukujesz czystą, poprawioną wersję w kilka sekund.</p>
+
+    <h2>3. Inteligentny Import i Kontrola Literówek</h2>
+    <p>W module <code>Baza-Edytor.html</code> wdrożyliśmy specjalny system weryfikacji na wypadek, gdyby kolega z brygady przygotował swoją materiałówkę, dopisał tam nowe narzędzia i przekazał Ci plik szablonu, abyś zaktualizował wspólny słownik.</p>
+    
+    <p>Gdy wgrywasz plik od kolegi, system uruchamia <strong>Bramkę Kontrolną</strong>:</p>
+    <ol>
+        <li>Komputer automatycznie porównuje nazwy z pliku z Twoją bazą i wyświetla jasny komunikat: <strong>„Wykryto [X] nowe pozycje w szablonie”</strong>.</li>
+        <li>Daje Ci wtedy dwie ścieżki do wyboru:
+            <ul>
+                <li><strong>Masowe dodanie:</strong> Jeśli ufasz koledze, system jednym kliknięciem wrzuca wszystko na samą górę tabeli i podświetla te wiersze na <strong>neonowy zielony kolor</strong> z plakietką <strong>[NOWOŚĆ]</strong>. Łatwo je wtedy przejrzeć i przypisać im poprawne kategorie.</li>
+                <li><strong>Szczegółowy przegląd (Obrona przed literówkami):</strong> System otwiera okienko, w którym wyświetla nowe pozycje pojedynczo, linijka po linijce. Jeśli kolega zrobił błąd (np. napisał <em>"Miernik specjistyczny"</em>), możesz **poprawić tę literówkę bezpośrednio w okienku** i dopiero wtedy zatwierdzić do bazy. Pozycje z błędami możesz też całkowicie odrzucić.</li>
+            </ul>
+        </li>
+    </ol>
+    <p>Zielone wyróżnienia nowości znikają automatycznie, gdy klikniesz fioletowy przycisk zapisu bazy, co oznacza, że słownik został trwale scalony.</p>
+
+    <h2>4. Geometria Wydruku (Jak powstaje PDF?)</h2>
+    <p>Program posiada zakodowaną instrukcję formatowania obrazu pod oryginalne, fabryczne druki <strong>MM Kwidzyn</strong>. Podczas kliknięcia przycisku druku zachodzą następujące rzeczy:</p>
+    <ul>
+        <li>Wszystkie przyciski, paski kategorii oraz ikony koszy (🗑️) **automatycznie znikają** — nie będzie ich widać na papierze ani na pliku PDF.</li>
+        <li>System sam decyduje o liczbie stron: jeśli zapełnisz tylko 5 wierszy, wydrukuje się tylko 1 strona (z danymi auta i podpisami). Jeśli przekroczysz wiersz 5., system automatycznie otworzy Stronę 2., a jeśli wyjedziesz poza 30. pozycję — aktywuje Stronę 3. i sam zaktualizuje numery stron w nagłówkach (np. 1 z 3, 2 z 3).</li>
+    </ul>
+
+    <h2>5. Przyszły Rozwój (Co czeka na wdrożenie?)</h2>
+    <div class="alert-box-pink">
+        <strong>📌 PLANOWANE USPRAWNIENIE: System "Klikaj mniej" (Automat J.m. i Ilości)</strong>
+        <p style="margin-top: 5px;">W kolejnej wersji planujemy wdrożenie automatu dla kolumn pobocznych. W 95% przypadków brygada zabiera pojedyncze sztuki narzędzi. System po wykryciu wpisania lub wybrania nazwy przedmiotu ma **od razu sam wpisać "szt." oraz cyfrę "1"**. Użytkownik będzie dotykał tych pól tylko wtedy, gdy będzie zabierał czegoś więcej (np. 2 lub 3 paczki elektrod).</p>
+    </div>
+
+    <div class="footer">
+        System Generatorów Specyfikacji Materiałowych — MM Kwidzyn (Wersja 2026).<br>
+        <strong>Prywatność:</strong> Strona ładuje się z sieci, ale wszystkie wpisywane dane są przetwarzane wyłącznie na Twoim urządzeniu i nigdzie nie są wysyłane.
+    </div>
+</div>
+
+</body>
+</html>

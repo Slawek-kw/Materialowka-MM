@@ -19,12 +19,7 @@
             --border-color: #cbd5e1;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
             background-color: var(--bg-app);
@@ -46,135 +41,34 @@
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
-        .hub-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .hub-header { text-align: center; margin-bottom: 30px; }
+        .hub-title { font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .hub-subtitle { font-size: 15px; color: var(--text-muted); margin-top: 6px; }
 
-        .hub-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
+        .status-bar { padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 30px; text-align: center; border: 1px solid transparent; }
+        .status-ok { background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+        .status-error { background-color: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 
-        .hub-subtitle {
-            font-size: 15px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .status-bar {
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 1px solid transparent;
-        }
-
-        .status-ok {
-            background-color: #f0fdf4;
-            border-color: #bbf7d0;
-            color: #166534;
-        }
-
-        .status-error {
-            background-color: #fef2f2;
-            border-color: #fca5a5;
-            color: #991b1b;
-        }
-
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .module-card {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-
-        .module-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 20px -5px rgb(0 0 0 / 0.05);
-        }
-
-        .module-content {
-            margin-bottom: 20px;
-        }
-
-        .module-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .module-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-
-        .module-desc {
-            font-size: 13.5px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .btn-action {
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-
+        .modules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .module-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .module-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 20px -5px rgb(0 0 0 / 0.05); }
+        .module-content { margin-bottom: 20px; }
+        .module-icon { font-size: 32px; margin-bottom: 12px; }
+        .module-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .module-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+        
+        .btn-action { width: 100%; padding: 10px; text-align: center; color: white; font-weight: bold; font-size: 14px; border-radius: 6px; transition: background 0.2s; }
         .btn-main { background-color: var(--primary); }
-        .module-card:hover .btn-main { background-color: var(--primary-hover); }
-
         .btn-extra { background-color: var(--purple); }
-        .module-card:hover .btn-extra { background-color: var(--purple-hover); }
-
         .btn-editor { background-color: var(--success); }
-        .module-card:hover .btn-editor { background-color: var(--success-hover); }
 
-        .hub-footer {
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
+        .help-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 10px; }
+        .help-box summary { cursor: pointer; font-weight: bold; color: var(--primary); font-size: 15px; outline: none; }
 
-        /* --- MEDIA QUERIES (RESPONSYWNOŚĆ) --- */
+        .hub-footer { text-align: center; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 30px; }
+
         @media (max-width: 768px) {
-            .modules-grid {
-                grid-template-columns: 1fr; /* Na tabletach i telefonach kafelki lądują jeden pod drugim */
-                gap: 15px;
-            }
-            .hub-container {
-                padding: 25px 20px;
-            }
-            .hub-title {
-                font-size: 22px;
-            }
+            .modules-grid { grid-template-columns: 1fr; gap: 15px; }
         }
     </style>
 </head>
@@ -195,7 +89,7 @@
                 <div class="module-content">
                     <div class="module-icon">📄</div>
                     <div class="module-title">Główna Specyfikacja</div>
-                    <div class="module-desc">Podstawowy generator dokumentu (Strona 1 i Strona 2). Zawiera pełne dane pracownika, pojazdu oraz automatyczny podział 55 pozycji.</div>
+                    <div class="module-desc">Podstawowy generator dokumentu. Zawiera dane pracownika, pojazdu oraz automatyczny podział pozycji.</div>
                 </div>
                 <div class="btn-action btn-main">Otwórz generator</div>
             </a>
@@ -204,7 +98,7 @@
                 <div class="module-content">
                     <div class="module-icon">➕</div>
                     <div class="module-title">Strona Dodatkowa</div>
-                    <div class="module-desc">Arkusz dokładki (Załącznik 12a) dla dużych zleceń. Pozwala dopisać kolejne 25 pozycji z zachowaniem czystej, ręcznej numeracji Lp.</div>
+                    <div class="module-desc">Arkusz dokładki (Załącznik 12a) dla dużych zleceń. Pozwala dopisać kolejne 25 pozycji.</div>
                 </div>
                 <div class="btn-action btn-extra">Otwórz dokładkę</div>
             </a>
@@ -213,14 +107,43 @@
                 <div class="module-content">
                     <div class="module-icon">🛠️</div>
                     <div class="module-title">Baza Narzędzi i Słownik</div>
-                    <div class="module-desc">Zarządzanie prywatnym spisem sprzętu. Możesz tu dodawać nowe pozycje, edytować uwagi oraz sortować spis alfabetycznie A-Z.</div>
+                    <div class="module-desc">Zarządzanie prywatnym spisem sprzętu. Dodawanie, edycja uwag oraz sortowanie bazy.</div>
                 </div>
                 <div class="btn-action btn-editor">Otwórz edytor bazy</div>
             </a>
         </div>
 
+        <details class="help-box">
+            <summary>📘 Jak przygotować specyfikację? (Instrukcja dla brygady)</summary>
+            <div style="margin-top: 15px; line-height: 1.7; color: #475569; font-size: 14px; text-align: left;">
+                
+                <p style="margin-bottom: 8px;"><b>1. 📄 Główna Specyfikacja (Moduł podwójnego działania)</b></p>
+                <p style="margin-bottom: 5px; padding-left: 10px;">Górny pasek przycisków branżowych (np. ❄️ HVAC, 🛠️ Ręczne) działa na dwa sposoby:</p>
+                <ul style="margin-bottom: 12px; padding-left: 30px;">
+                    <li><b>Pojedyncze kliknięcie:</b> Przycisk podświetla się na niebiesko. Tabela pozostaje pusta, ale rozwijalna lista podpowiedzi w kolumnie "Nazwa materiału" zostaje zablokowana na tej kategorii. Idealne, gdy chcesz ręcznie wybrać tylko kilka rzeczy z danej grupy.</li>
+                    <li><b>Podwójne kliknięcie (Szybki dwuklik):</b> Automatycznie wstrzykuje <u>cały pakiet</u> pozycji z wybranej kategorii do wolnych wierszy tabeli na raz.</li>
+                </ul>
+                <ul style="margin-bottom: 15px; padding-left: 20px;">
+                    <li><b>Ukrywanie wpisanych pozycji:</b> System pilnuje porządku. Jeśli dana pozycja znajduje się już w tabeli (wpisałeś je ręcznie lub wgrałeś dwuklikiem), automatycznie zniknie z rozwijalnej listy podpowiedzi, aby uniknąć przypadkowych duplikatów.</li>
+                    <li><b>Czyszczenie pozycji (Kosze 🗑️):</b> Pomyliłeś się? Kliknij kosz na końcu wiersza. Pole zostanie wyczyszczone, przedmiot wróci na listę podpowiedzi, a numeracja LP automatycznie się zaktualizuje.</li>
+                </ul>
+
+                <p style="margin-bottom: 8px;"><b>2. ➕ Strona Dodatkowa (Załącznik 12a)</b></p>
+                <ul style="margin-bottom: 15px; padding-left: 20px;">
+                    <li>Jeżeli zabierasz potężną ilość materiałów przekraczającą 55 pozycji, otwórz ten moduł.</li>
+                    <li>Generuje on czysty arkusz "dokładki", który pozwala dopisać kolejne pozycje z zachowaniem <u>ręcznej numeracji Lp.</u> (numery od 56 wzwyż wpisujesz samodzielnie), co zapewnia idealną ciągłość dla rewizji na bramie.</li>
+                </ul>
+
+                <p style="margin-bottom: 8px;"><b>3. 🖨️ Zapis szablonu, poprawki i wydruk PDF</b></p>
+                <ul style="padding-left: 20px;">
+                    <li><b>Zapis i możliwość wprowadzenia poprawek:</b> Z wypisywaniem materiałówek bywa różnie. Dlatego po uzupełnieniu danych warto kliknąć <b>Zapisz szablon</b> (.json). Jeśli okaże się, że musisz coś szybko zmienić lub usunąć, nie musisz pisać dokumentu od nowa! Wystarczy wczytać ten szablon z powrotem, nanieść korektę i wydrukować poprawioną wersję.</li>
+                    <li><b>Druk:</b> Kliknij fioletowy przycisk na samej górze. Przeglądarka wykadruje dokument pod wzór fabryczny MM. Wszystkie przyciski sterujące i ikony koszy <u>automatycznie znikną na wydruku</u>, zostawiając czysty dokument.</li>
+                </ul>
+            </div>
+        </details>
+
         <div class="hub-footer">
-            System działa lokalnie i korzysta z plików wewnętrznych. Nie wymaga połączenia z Internetem.
+            Strona ładuje się z sieci, ale wszystkie wpisywane dane są przetwarzane wyłącznie na Twoim urządzeniu i nigdzie nie są wysyłane.
         </div>
     </div>
 
@@ -228,13 +151,12 @@
     <script>
         const statusContainer = document.getElementById('status-container');
         const statusText = document.getElementById('status-text');
-
         if (typeof MOJA_BAZA_MATERIALOW !== 'undefined' && MOJA_BAZA_MATERIALOW.length > 0) {
             statusContainer.className = "status-bar status-ok";
-            statusText.innerText = `🟢 Słownik podłączony prawidłowo. Wykryto aktywnych pozycji w bazie: ${MOJA_BAZA_MATERIALOW.length}`;
+            statusText.innerText = `🟢 Słownik podłączony prawidłowo. Pozycji w bazie: ${MOJA_BAZA_MATERIALOW.length}`;
         } else {
             statusContainer.className = "status-bar status-error";
-            statusText.innerHTML = `⚠️ Uwaga: Nie znaleziono pliku bazy! Upewnij się, że plik o nazwie <strong>baza_materialow.js</strong> znajduje się w tym samym folderze co aplikacja.`;
+            statusText.innerHTML = `⚠️ Uwaga: Brak pliku <strong>baza_materialow.js</strong> w folderze!`;
         }
     </script>
 </body>
