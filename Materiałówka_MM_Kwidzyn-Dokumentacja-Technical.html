@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumentacja Techniczna - System Generatorów MM Kwidzyn</title>
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151f32;
+            --primary: #38bdf8;
+            --success: #34d399;
+            --purple: #a78bfa;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #22314d;
+            --code-bg: #090d16;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding: 40px 20px; }
+        
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { border-bottom: 2px solid var(--border); padding-bottom: 25px; margin-bottom: 35px; }
+        h1 { color: var(--primary); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 6px; font-weight: 500; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 12px; overflow-x: auto; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 12px 24px; font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 6px; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .tab-btn:hover { color: var(--text-main); background: #1e293b; }
+        .tab-btn.active { color: var(--bg-main); background: var(--primary); }
+
+        .content-section { display: none; background: var(--bg-card); padding: 35px; border-radius: 12px; border: 1px solid var(--border); line-height: 1.7; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3); }
+        .content-section.active { display: block; }
+
+        h2 { color: var(--primary); margin-bottom: 20px; font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-weight: 700; }
+        h3 { color: var(--success); margin: 25px 0 12px 0; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        p { margin-bottom: 16px; color: #cbd5e1; font-size: 15px; }
+        
+        ul, ol { margin-bottom: 25px; padding-left: 25px; color: #cbd5e1; font-size: 15px; }
+        li { margin-bottom: 10px; }
+        strong { color: #fff; }
+        
+        code { background: var(--code-bg); padding: 3px 8px; border-radius: 4px; font-family: 'Consolas', monospace; color: #f43f5e; font-size: 14px; border: 1px solid rgba(244, 63, 94, 0.2); }
+        .blueprint { background: var(--code-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border); font-family: 'Consolas', monospace; color: #38bdf8; margin: 20px 0; overflow-x: auto; font-size: 13.5px; line-height: 1.5; }
+        
+        .tech-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .tech-table th, .tech-table td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; }
+        .tech-table th { background-color: var(--code-bg); color: var(--primary); font-weight: 700; }
+        .tech-table tr:nth-child(even) { background-color: rgba(255,255,255,0.02); }
+
+        .alert-box { background: rgba(167, 139, 250, 0.07); border-left: 4px solid var(--purple); padding: 20px; border-radius: 6px; margin: 25px 0; border-top: 1px solid rgba(167, 139, 250, 0.1); border-right: 1px solid rgba(167, 139, 250, 0.1); border-bottom: 1px solid rgba(167, 139, 250, 0.1); }
+        .alert-box strong { color: var(--purple); font-size: 15px; }
+        .backlog-text { color: #e2e8f0; font-size: 14.5px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>SPECYFIKACJA MATERIAŁOWA MM KWIDZYN - DOKUMENTACJA TECHNICZNA</h1>
+        <div class="subtitle">Szczegółowa specyfikacja kodu źródłowego, algorytmów i struktur danych (Aktualizacja: 2026)</div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('struktura')">📁 Architektura Plików</button>
+        <button class="tab-btn" onclick="openTab('dual-logic')">🧠 Algorytmy Wyboru</button>
+        <button class="tab-btn" onclick="openTab('walidacja')">🔍 Walidacja i Wiersze</button>
+        <button class="tab-btn" onclick="openTab('druk-json')">💾 JSON i Formatowanie PDF</button>
+        <button class="tab-btn" onclick="openTab('backlog')">📋 Plan Rozwoju (Backlog)</button>
+    </div>
+
+    <div id="struktura" class="content-section active">
+        <h2>1. Ekosystem i Zależności Plikowe</h2>
+        <p>Projekt stanowi lokalną aplikację webową (SPA / Client-Side), która nie wymaga serwera bazodanowego ani dedykowanego zaplecza sieciowego podczas przetwarzania danych. Integracja opiera się na bezpośrednim mapowaniu plików w tym samym katalogu root.</p>
+        
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Nazwa pliku</th>
+                    <th>Typ modułu</th>
+                    <th>Główne zadania i mechanizmy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>Start-Uruchom-Specyfikacje.html</code></td>
+                    <td>Hub/Interfejs startowy</td>
+                    <td>Zapewnienie punktu wejścia dla personelu, weryfikacja istnienia bazy danych w locie, dystrybucja zaktualizowanej instrukcji obsługi. Podlega pod hostowanie na GitHub.</td>
+                </tr>
+                <tr>
+                    <td><code>Specyfikacja materiałowa MM.html</code></td>
+                    <td>Generator główny</td>
+                    <td>Rysowanie formularza roboczego (55 wierszy), implementacja logiki zdarzeń myszy, mechanizm usuwania duplikatów ze słownika, obsługa wejścia/wyjścia struktur JSON.</td>
+                </tr>
+                <tr>
+                    <td><code>Specyfikacja materiałowa MM - Strona Dodatkowa.html</code></td>
+                    <td>Załącznik 12a</td>
+                    <td>Arkusz rozszerzenia dla zleceń powyżej 55 pozycji. Pozbawiony autonumeracji z powodów proceduralnych weryfikacji na bramie zakładu.</td>
+                </tr>
+                <tr>
+                    <td><code>Baza-Edytor.html</code></td>
+                    <td>Edytor słownika</td>
+                    <td>Zaawansowane zarządzanie bazą, dodawanie, usuwanie, funkcja masowego importu z plików zewnętrznych oraz modalne okno kontroli literówek.</td>
+                </tr>
+                <tr>
+                    <td><code>baza_materialow.js</code></td>
+                    <td>Magazyn danych (JSONP)</td>
+                    <td>Zewnętrzny plik ze stałym obiektem danych narzędziowych i chemicznych, ładowany poprzez tag <code>&lt;script&gt;</code> na początku plików generatorów.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Struktura Schematu Bazy Słownikowej</h3>
+        <p>Dane w pliku <code>baza_materialow.js</code> są zapisane w formie tablicy obiektów JavaScript przypisanej do zmiennej globalnej <code>MOJA_BAZA_MATERIALOW</code>. Każdy obiekt musi ściśle przestrzegać następującej struktury kluczy:</p>
+        <div class="blueprint">
+window.MOJA_BAZA_MATERIALOW = [<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"name": "Klucz płasko-oczkowy 13mm", <span style="color: #64748b;">// Ciąg znaków wyświetlany w polu wyboru (Unikalny)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;"kat": "Narzędzia ręczne", &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #64748b;">// Flaga kategoryzacji (Musi odpowiadać data-kat przycisków)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;"uwagi": "Knipex / Stanley" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #64748b;">// Wartość automatycznie wstrzykiwana do kolumny Uwagi</span><br>
+&nbsp;&nbsp;}<br>
+];
+        </div>
+    </div>
+
+    <div id="dual-logic" class="content-section">
+        <h2>2. Implementacja Mechanizmu Dual-Logic</h2>
+        <p>Aby umożliwić jednoczesne filtrowanie słownika oraz masowe ładowanie danych przy pomocy jednego zestawu kontrolek, wdrożono algorytm rozróżniania zdarzeń oparty na asynchronicznym opóźnieniu czasowym (Debounce/Timer).</p>
+        
+        <h3>Mechanizm rejestracji zdarzeń w pętli DOM</h3>
+        <p>Przyciskom przypisana jest klasa <code>.btn-pkg</code> oraz atrybut <code>data-kat</code>. Skrypt JavaScript przypisuje dwa niezależne nasłuchiwania (<code>EventListener</code>) na każdy element:</p>
+        
+        <ol>
+            <li><strong>Zdarzenie pojedynczego kliknięcia (<code>'click'</code>):</strong>
+                <ul>
+                    <li>W momencie wywołania sprawdzane jest czy zmienna <code>clickTimer</code> przechowuje referencję do aktywnego licznika. Jeśli tak, zostaje ona natychmiast zresetowana za pomocą <code>clearTimeout(clickTimer)</code>.</li>
+                    <li>Inicjalizowany jest nowy licznik <code>setTimeout</code> z czasem oczekiwania wynoszącym dokładnie <strong><code>250ms</code></strong>.</li>
+                    <li>Jeśli w tym interwale nie nastąpi drugie kliknięcie, skrypt wykonuje operację filtrowania: ustawia zmienną <code>AKTUALNIE_AKTYWNA_KATEGORIA</code> na wartość pobraną z <code>data-kat</code>, nadaje klasę <code>.active</code> klikniętemu przyciskowi i wywołuje funkcję <code>przebudujDatalistPodKategorie()</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Zdarzenie podwójnego kliknięcia (<code>'dblclick'</code>):</strong>
+                <ul>
+                    <li>Wywoływane, gdy przeglądarka zarejestruje drugie kliknięcie w czasie krótszym niż 250ms.</li>
+                    <li>Pierwszym krokiem jest bezwzględne zniszczenie oczekującego licznika: <code>clearTimeout(clickTimer)</code>, co całkowicie zapobiega uruchomieniu procedury pojedynczego kliknięcia.</li>
+                    <li>Następuje wymuszenie podświetlenia przycisku (klasa <code>.active</code>) oraz bezpośrednie wywołanie funkcji masowego, inteligentnego wstrzykiwania: <code>wczytajMaseSprzetuZFilmu(AKTUALNIE_AKTYWNA_KATEGORIA)</code>.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Specyfikacja systemu pomocy (Korekta UI)</h3>
+        <p>Opisy stanów interfejsu w pliku uruchomieniowym zostały sformalizowane językowo w celu ujednolicenia pojęć. Wykluczono potoczne określenia (np. "branża"), zastępując je standaryzacją techniczną:</p>
+        <ul>
+            <li><code>Pojedyncze kliknięcie</code>: Blokuje obiekt <code>&lt;datalist&gt;</code> w kolumnie "Nazwa materiału" na wybranej kategorii.</li>
+            <li><code>Podwójne kliknięcie (Szybki dwuklik)</code>: Wstrzykuje kompletny pakiet pozycji z wybranej kategorii do pustych węzłów tabeli DOM.</li>
+        </ul>
+    </div>
+
+    <div id="walidacja" class="content-section">
+        <h2>3. Walidacja Duplikatów i Kontrola Stanu Wierszy</h2>
+        
+        <h3>Algorytm dynamicznego usuwania pozycji ze słownika (Znikające podpowiedzi)</h3>
+        <p>Aby wykluczyć możliwość dwukrotnego wpisania tego samego przedmiotu (co generuje problemy formalne podczas rewizji materiałowej), element <code>&lt;datalist id="slownik-materialow"&gt;</code> jest w całości czyszczony i generowany od zera przy każdej modyfikacji tabeli.</p>
+        <p>Funkcja <code>przebudujDatalistPodKategorie()</code> działa według ściśle określonego schematu:</p>
+        <ol>
+            <li>Iteruje przez wszystkie wiersze tabeli od 1 do 55 i pobiera ciągi tekstowe z pól <code>input-nazwa-[i]</code>. Jeśli pole nie jest puste, jego zawartość jest oczyszczana metodą <code>trim().toLowerCase()</code> i zapisywana w tymczasowej tablicy <code>aktualnieUzyteNazwy</code>.</li>
+            <li>Następuje odczyt tablicy słownika <code>MOJA_BAZA_MATERIALOW</code>.</li>
+            <li>W pętli sprawdzane są dwa warunki:
+                <br><code>if ((KategoriaPrzedmiotu == KategoriaAktywna || KategoriaAktywna == "Wszystkie") && !aktualnieUzyteNazwy.includes(NazwaZeSłownika.toLowerCase()))</code>
+            </li>
+            <li>Tylko pozycje spełniające ten warunek są wstrzykiwane jako tagi <code>&lt;option&gt;</code> do listy podpowiedzi.</li>
+        </ol>
+
+        <h3>Mechanizm detekcji zmian i style CSS kontrastu wysoki/niski</h3>
+        <p>Wprowadzenie tekstu do dowolnego pola wiersza aktywuje funkcję <code>obslugaZmianyInputu(index)</code>. Wykonuje ona natychmiastowe sprawdzenie logiczne:</p>
+        <ul>
+            <li>Jeśli pola wiersza zawierają jakiekolwiek znaki, do elementu <code>&lt;tr id="row-tr-[index]"&gt;</code> dopisywana jest klasa CSS <code>.has-data</code>.</li>
+            <li>Klasa <code>.has-data</code> wymusza zmianę tła wiersza z szarego na czystą biel (<code>#ffffff !important</code>) oraz zmienia wagę czcionki tekstu na <code>font-weight: 700</code> (kolor głęboka czerń <code>#000000</code>). Pozwala to na błyskawiczne odróżnienie pozycji wypełnionych od pustych.</li>
+            <li>Wyczyszczenie wiersza przyciskiem kosza <code>🗑️</code> (funkcja <code>clearRowData(index)</code>) usuwa klasę <code>.has-data</code>, co natychmiastowo przywraca szary odcień tła i oddaje usunięty przedmiot z powrotem do bazy podpowiedzi słownika. Oczyszczono nagłówek z redundantnych sformułowań (usunięto frazę "dla ochrony").</li>
+        </ul>
+
+        <h3>Logika dynamicznej aktywacji numeracji LP (Wiersze 31 - 55)</h3>
+        <p>Dla ochrony geometrii dokumentu i czytelności, wiersze od 31 do 55 mają pierwotnie ukrytą numerację (wyświetlają znak <code>—</code> za pomocą klasy <code>.empty-lp</code>). Dopiero wywołanie zdarzenia <code>onfocus</code> w polu nazwy danego wiersza uruchamia funkcję <code>activateRow(index)</code>, która trwale podmienia tekst komórki na realną cyfrę indeksu, zatwierdzając wiersz do fizycznego ujęcia na wydruku. Nagłówek sekcji zmapowano jako <code>Ukrywanie wpisanych pozycji</code>.</p>
+    </div>
+
+    <div id="druk-json" class="content-section">
+        <h2>4. Obsługa Obiektów JSON i Architektura Wydruku PDF</h2>
+        
+        <h3>Struktura Pliku KpII Szablonu (.json)</h3>
+        <p>Funkcja <code>exportTemplateJSON()</code> konsoliduje stan formularza i buduje zunifikowany obiekt danych, który jest pobierany na dysk jako plik tekstowy. Struktura danych została zaprojektowana w sposób płaski w celu zachowania maksymalnej profesjonalnej szybkości parsowania:</p>
+        <div class="blueprint">
+{<br>
+&nbsp;&nbsp;"przepustka": "123/2026",<br>
+&nbsp;&nbsp;"wykonawca": "HVAC Master Serwis",<br>
+&nbsp;&nbsp;"data": "2026-06-17",<br>
+&nbsp;&nbsp;"kierunek": "wwoz", <span style="color: #64748b;">// Akceptowalne wartości: 'wwoz' lub 'wywoz'</span><br>
+&nbsp;&nbsp;"nazwisko": "Kowalski Jan",<br>
+&nbsp;&nbsp;"pesel": "850512XXXXX",<br>
+&nbsp;&nbsp;"marka": "Ford S-Max",<br>
+&nbsp;&nbsp;"rejestracja": "GKW 12345",<br>
+&nbsp;&nbsp;"items": [ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #64748b;">// Tablica zawierająca dokładnie 55 obiektów pozycji</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "lp_text": "1", "nazwa": "Młotek", "jm": "szt.", "qty": "1", "uwagi": "Stanley" },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "lp_text": "—", "nazwa": "", "jm": "", "qty": "", "uwagi": "" }<br>
+&nbsp;&nbsp;]<br>
+}
+        </div>
+
+        <h3>Logika Generowania Stron PDF w onbeforeprint</h3>
+        <p>Podczas wywołania systemowego okna drukowania, funkcja <code>window.onbeforeprint()</code> przeprowadza automatyczną kalkulację rozkładu pozycji na fizycznych stronach formatu A4:</p>
+        
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Zakres wierszy edycji</th>
+                    <th>Strona docelowa PDF</th>
+                    <th>Warunek aktywacji sekcji</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Wiersze <code>1 - 5</code></td>
+                    <td><strong>Strona 1</strong> (Główna)</td>
+                    <td>Zawsze aktywna. Zawiera pełny blok metadanych pracownika, pojazdu, klauzulę RODO oraz sekcje podpisów i kontroli ochrony.</td>
+                </tr>
+                <tr>
+                    <td>Wiersze <code>6 - 30</code></td>
+                    <td><strong>Strona 2</strong> (Kontynuacja)</td>
+                    <td>Aktywowana (<code>display: block</code>), jeśli choć jeden wiersz z tego przedziału posiada przypisaną klasę <code>.has-data</code>. W przeciwnym wypadku obiekt jest ukrywany, a łączna liczba stron w nagłówku ustawia się na 1.</td>
+                </tr>
+                <tr>
+                    <td>Wiersze <code>31 - 55</code></td>
+                    <td><strong>Strona 3</strong> (Dodatkowa)</td>
+                    <td>Aktywowana, gdy pozycje wykroczą poza indeks 30. Wymusza ustawienie łącznej liczby stron na 3. Modyfikuje widoki liczników stron na wszystkich nagłówkach papierowych dokumentu.</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Klauzula bezpieczeństwa danych w architekturze sieciowej</h3>
+        <p>Zdefiniowano sztywną politykę prywatności w stopce interfejsu (<code>.hub-footer</code>), uwzględniającą hybrydowy model działania repozytorium GitHub Pages:</p>
+        <div class="blueprint">
+&lt;div class="hub-footer"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Strona ładuje się z sieci, ale wszystkie wpisywane dane są przetwarzane wyłącznie na Twoim urządzeniu i nigdzie nie są wysyłane.<br>
+&lt;/div&gt;
+        </div>
+    </div>
+
+    <div id="backlog" class="content-section">
+        <h2>5. Zatwierdzony Plan Rozwoju (Backlog Techniczny)</h2>
+        <p>Poniższa sekcja zawiera wytyczne dla przyszłych modyfikacji kodu, ustalone na podstawie analizy ergonomii pracy terenowej:</p>
+        
+        <div class="alert-box">
+            <strong>📌 ZADANIE: Automatyzacja pól J.m. oraz Ilości ("Klikaj mniej")</strong>
+            <div class="backlog-text">
+                <p><strong>Status:</strong> Oczekuje na implementację.</p>
+                <p><strong>Cel algorytmu:</strong> Całkowite odciążenie użytkownika od konieczności ręcznego przeklikiwania kolumn pobocznych przy standardowym wyposażeniu.</p>
+                <p><strong>Wytyczne techniczne:</strong> Należy zmodyfikować funkcje <code>obslugaZmianyInputu(index)</code> oraz mechanizm pętli <code>wczytajMaseSprzetuZFilmu()</code>. W momencie, gdy pole nazwy narzędzia zostaje uzupełnione wartością niepustą, program ma wykonać test: jeśli pola Jednostki miary oraz Ilości są puste, skrypt ma bezpośrednio przypisać do właściwości <code>.value</code> pól input odpowiednio ciąg znaków <code>"szt."</code> oraz cyfrę <code>"1"</code>. Modyfikacja musi automatycznie nadać wierszowi klasę <code>.has-data</code>.</p>
+            </div>
+        </div>
+
+        <div class="alert-box" style="border-left-color: var(--success); background: rgba(52, 211, 153, 0.05);">
+            <strong style="color: var(--success);">🟢 STATUS: Zrealizowano pomyślnie (Wdrożono do Baza-Edytor.html)</strong>
+            <div class="backlog-text" style="margin-top: 10px;">
+                <p><strong>Mechanizm kontroli literówek i licznika nowości:</strong> Zaprojektowano i wdrożono algorytm porównujący asynchronicznie zawartość zewnętrznych plików JSON z lokalną strukturą bazy danych. System poprawnie zlicza unikalne elementy, filtruje duble metodą <code>toLowerCase()</code> i uruchamia modalny bufor weryfikacyjny. Funkcja obsługuje bezpieczne modyfikacje wartości w locie przed zatwierdzeniem oraz masowe wypychanie pozycji na szczyt tablicy metodą <code>unshift/prepend</code> z przypisaniem klasy wizualnej <code>.is-new-row</code>.</p>
+            </div>
+        </div>
+
+        <h3>Decyzje projektowe (Odrzucone/Zamknięte):</h3>
+        <ul>
+            <li><strong>Blokada przechowywania danych w LocalStorage:</strong> Ze względów bezpieczeństwa (praca na losowych komputerach, ochrona PESEL oraz danych rejestracyjnych pojazdów) zabrania się implementacji automatycznego zapisu profilu w pamięci podręcznej przeglądarki. Dane mogą być przenoszone wyłącznie za pomocą bezpiecznych, jawnych plików JSON kontrolowanych przez użytkownika.</li>
+            <li><strong>Brak dedykowanego przycisku Reset:</strong> Funkcja czyszczenia całego formularza została powierzona natywnemu odświeżeniu strony za pomocą klawisza <code>F5</code>. Pozwala to uniknąć wprowadzania zbędnych skryptów czyszczących tablice i upraszcza architekturę kodu interfejsu.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function openTab(tabId) {
+        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+</body>
+</html>
