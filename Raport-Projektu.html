@@ -2,185 +2,254 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raport z Procesu Tworzenia Projektu - Materiałówka MM Kwidzyn</title>
+    <title>Raport z Procesu Tworzenia i Integracji Projektu - Materiałówka MM Kwidzyn</title>
     <style>
         :root {
-            --primary: #1e3a8a;
-            --primary-light: #eff6ff;
-            --accent: #10b981;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --bg-page: #f8fafc;
+            --primary: #2563eb;
+            --success: #10b981;
+            --purple: #8b5cf6;
+            --dark-header: #334155;
+            --bg-app: #f1f5f9;
             --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-app); 
+            color: var(--text-main); 
+            padding: 30px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
         }
-
-        body {
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 850px;
+        
+        .report-container { 
+            width: 100%; 
+            max-width: 1000px; 
             margin: 0 auto;
-            background: var(--bg-card);
-            padding: 40px;
+        }
+
+        /* --- STYLIZACJA NAGŁÓWKA RAPORTU --- */
+        .report-header {
+            background-color: var(--dark-header);
+            color: #ffffff;
+            padding: 35px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            text-align: center;
         }
 
-        header {
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+        .report-title { font-size: 24px; font-weight: 800; letter-spacing: 0.5px; }
+        .report-subtitle { font-size: 14px; color: #cbd5e1; margin-top: 6px; font-weight: 500; }
+
+        /* --- KAFELKOWE SEKCJE RAPORTU (BOXED STYLE) --- */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
         }
 
-        h1 {
+        .section-card h2 {
+            font-size: 17px;
             color: var(--primary);
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 5px;
-        }
-
-        .meta-info {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        h2 {
-            color: var(--primary);
-            font-size: 18px;
             font-weight: 700;
-            margin-top: 30px;
-            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         p {
-            font-size: 15px;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            text-align: justify;
+            font-size: 14.5px;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 14px;
         }
 
-        ul, ol {
-            margin-left: 20px;
-            margin-bottom: 20px;
-            font-size: 15px;
+        ul {
+            margin-bottom: 15px;
+            padding-left: 20px;
         }
 
         li {
+            font-size: 14px;
+            color: #475569;
             margin-bottom: 8px;
+            line-height: 1.5;
         }
 
         strong {
             color: #0f172a;
         }
 
-        .highlight-box {
-            background-color: var(--primary-light);
-            border-left: 4px solid var(--primary);
-            padding: 15px 20px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-            font-size: 14.5px;
+        /* --- STRUKTURA DANYCH / HISTORIA ETAPÓW --- */
+        .timeline-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.01);
         }
 
-        .highlight-box strong {
-            color: var(--primary);
+        .timeline-step {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--dark-header);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline-step span {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* --- STYLIZACJA PODSUMOWANIA TABELARYCZNEGO --- */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: var(--dark-header);
+        }
+
+        .summary-table tr:nth-child(even) td {
+            background-color: #f8fafc;
         }
 
         .badge {
-            background-color: #f1f5f9;
-            color: #334155;
-            padding: 3px 8px;
+            display: inline-block;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid #cbd5e1;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
+        .badge-blue { background-color: #dbeafe; color: #1e40af; }
+        .badge-purple { background-color: #f3e8ff; color: #6b21a8; }
+        .badge-green { background-color: #dcfce7; color: #166534; }
 
-        .badge-success {
-            background-color: #ecfdf5;
-            color: #065f46;
-            border-color: #a7f3d0;
-        }
-
-        footer {
-            margin-top: 40px;
+        .footer {
+            text-align: center;
+            margin-top: 35px;
             padding-top: 20px;
             border-top: 1px solid var(--border-color);
-            text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Raport z Procesu Tworzenia Projektu</h1>
-            <div class="meta-info">Projekt: Materiałówka MM Kwidzyn &bull; Moduł: Baza-Edytor.html</div>
-        </header>
-
-        <section>
-            <h2>1. Cel projektu i założenia początkowe</h2>
-            <p>Głównym zadaniem całego systemu jest automatyzacja procesu wprowadzania danych ze specyfikacji technicznych (np. plików PDF) bezpośrednio do formularza HTML/JavaScript o nazwie <strong>Specyfikacja materiałowa MM.html</strong>. Aby zapewnić poprawne działanie, dynamiczne dopasowywanie oraz walidację pól, formularz wymaga stałego dostępu do aktualnego słownika produktów, narzędzi i materiałów eksploatacyjnych.</p>
-            <p>Plik <strong>Baza-Edytor.html</strong> został zaprojektowany jako wewnętrzny panel administracyjny. Jego celem jest umożliwienie użytkownikowi wygodnego dodawania, usuwania, modyfikowania oraz kategoryzowania zasobów bez konieczności bezpośredniej i ryzykownej edycji kodu źródłowego pliku danych <span class="badge">baza_materialow.js</span>.</p>
-        </section>
-
-        <section>
-            <h2>2. Przebieg prac i napotkane wyzwania</h2>
-            <p>Ewolucja modułu edytora bazy danych objęła trzy główne kamienie milowe, które pozwoliły na wyeliminowanie krytycznych błędów oraz rozbudowę narzędzia o inteligentne funkcje:</p>
-            
-            <ol>
-                <li>
-                    <strong>Krok A: Implementacja systemu kontrolowanego importu</strong>
-                    <br>Wprowadzona została zaawansowana funkcja importu danych z zewnętrznych szablonów JSON. System zyskał logikę filtrującą duplikaty w oparciu o analizę nazw (małe i wielkie litery). Zaprojektowano dwa scenariusze wdrożenia nowych pozycji: import masowy na górę listy z wizualnym wyróżnieniem oraz szczegółowy przegląd krok po kroku w oknie modalnym, pozwalający na poprawę literówek przed zapisem.
-                </li>
-                <li>
-                    <strong>Krok B: Awaria struktury skryptu („posypany układ”)</strong>
-                    <br>Podczas próby samodzielnej reorganizacji nazewnictwa i masowej podmiany słowa <em>„słownik”</em> w kodzie źródłowym, doszło do uszkodzenia wewnętrznej logiki skryptu. Zmiana objęła nie tylko treści opisowe, ale również kluczowe nazwy zmiennych systemowych. Skutkowało to całkowitym zablokowaniem renderowania tabeli i brakiem reakcji kontrolek interfejsu.
-                </li>
-                <li>
-                    <strong>Krok C: Konsolidacja, naprawa i optymalizacja</strong>
-                    <br>Problem rozwiązano poprzez całkowite scalenie kodu. Wykorzystano nienaruszoną, stabilną warstwę wizualną (CSS) oraz mechanizm filtrów z wersji <em>„dobry układ”</em>, w którą wstrzyknięto poprawioną, oczyszczoną z błędów składniowych logikę JavaScript odpowiedzialną za buforowanie nowości oraz obsługę okien modalnych.
-                </li>
-            </ol>
-        </section>
-
-        <div class="highlight-box">
-            <strong>Wnioski z optymalizacji:</strong> Separacja warstwy danych od widoku oraz zastosowanie delegowania zdarzeń pozwoliło na pełne zabezpieczenie aplikacji przed błędami składniowymi przy przyszłych aktualizacjach bazy.
+    <div class="report-container">
+        
+        <div class="report-header">
+            <h1 class="report-title">📈 Raport z Procesu Rozwoju i Integracji Projektu</h1>
+            <p class="report-subtitle">System Cyfrowych Przepustek Materiałowych — ZP MM Kwidzyn sp. z o.o.</p>
         </div>
 
-        <section>
-            <h2>3. Stan obecny i kluczowe funkcjonalności Edytora</h2>
-            <p>Panel zarządczy w obecnej, finalnej wersji charakteryzuje się pełną stabilnością i zawiera następujące rozwiązania techniczne:</p>
+        <div class="section-card">
+            <h2>Etap 1: Geneza Projektu i Identyfikacja Problemów</h2>
+            <p>Projekt zrodził się z potrzeby wyeliminowania uciążliwego, ręcznego wypisywania wielostronicowych specyfikacji materiałowych wymaganych przez ochronę przy wjeździe na zakład produkcyjny MM Kwidzyn. Kluczowymi problemami pierwotnego procesu były:</p>
             <ul>
-                <li><strong>Kompatybilność z przeglądarkami mobilnymi:</strong> Filtry kategorii branżowych działają w oparciu o nasłuchiwanie paska głównego, co gwarantuje prawidłowe przechwytywanie kliknięć również na silnikach mobilnych (np. Opera Mobile).</li>
-                <li><strong>Izolowany widok tabeli (Scroll):</strong> Dzięki nadaniu kontenerowi sztywnej wysokości maksymalnej, długa lista pozycji przewija się wewnątrz wyznaczonego obszaru, pozostawiając przyciski akcji oraz nagłówek zablokowane na ekranie.</li>
-                <li><strong>Automatyczne sortowanie alfabetyczne PL (A-Z):</strong> Podczas generowania pliku wyjściowego, skrypt automatycznie sortuje bazę od A do Z z poprawnym uwzględnieniem polskich znaków diakrytycznych, oczyszcza dane z pustych rekordów i usuwa tymczasowe znaczniki wizualne nowości.</li>
-                <li><strong>Szybki eksport strukturalny:</strong> Wynikiem zapisu jest gotowy plik w formacie <span class="badge badge-success">const MOJA_BAZA_MATERIALOW = [...]</span>, przystosowany do bezpośredniego nadpisania w środowisku produkcyjnym projektu.</li>
+                <li><strong>Wysokie ryzyko pomyłek:</strong> Ręczne wpisywanie dziesiątek specjalistycznych narzędzi HVAC i BHP prowadziło do literówek i przestojów na bramie głównej.</li>
+                <li><strong>Dezorganizacja plików dokumentów:</strong> Używanie oddzielnych, niezależnych plików dla specyfikacji głównej oraz tzw. "Dokładek" (Stron Dodatkowych) utrudniało pracę personelu i generowało chaos w nazewnictwie struktur.</li>
+                <li><strong>Brak standaryzacji:</strong> Brak jednolitej bazy asortymentowej powodował opisywanie tych samych przedmiotów w różny, niespójny sposób.</li>
             </ul>
-        </section>
+        </div>
 
-        <footer>
-            Dokumentacja wygenerowana automatycznie dla projektu Materiałówka MM Kwidzyn &copy; 2026
-        </footer>
+        <div class="section-card">
+            <h2>Etap 2: Ewolucja Architektoniczna (Przełom Integracyjny)</h2>
+            <p>Kamieniem milowym w rozwoju systemu było odejście od modelu rozproszonego i **całkowite skonsolidowanie formularzy w jeden zintegrowany rdzeń aplikacyjny** (Single Page Interface).</p>
+            <div class="timeline-box">
+                <div class="timeline-step"><span>Faza A</span> Rozwój niezależnych generatorów dla strony głównej i dodatkowej.</div>
+                <div class="timeline-step"><span>Faza B</span> Integracja mechanizmów JavaScript w jeden wspólny silnik logiczny.</div>
+                <div class="timeline-step"><span>Faza C (Finalna)</span> Połączenie widoków w pliku <code>Specyfikacja-Materialowa-Pelna.html</code> z kontrolą kart nawigacyjnych (Tabs).</div>
+            </div>
+            <p style="margin-top: 15px;">Dzięki tej zmianie, brygada serwisowa zyskała jedno, centralne narzędzie robocze. Przełączanie między spisem głównym a dodatkowym realizowane jest w locie za pomocą bezpiecznych zakładek, a silnik PDF sam wykrywa aktywny kontekst i odpowiednio formatuje docelowy wydruk.</p>
+        </div>
+
+        <div class="section-card">
+            <h2>Etap 3: Wdrożenie Inteligentnej Bazy Danych (Live Engine)</h2>
+            <p>Wprowadzenie centralnego repozytorium sprzętu w zewnętrznym pliku <code>baza_materialow.js</code> pozwoliło na uruchomienie zaawansowanej automatyzacji asystującej użytkownikowi podczas pracy:</p>
+            <ul>
+                <li><strong>Dynamiczne czyszczenie duplikatów:</strong> Algorytmy filtrujące w locie analizują zajęte wiersze na obu stronach. Wpisanie narzędzia na stronie głównej natychmiast wyklucza je z podpowiedzi na stronie dodatkowej.</li>
+                <li><strong>Wgrywanie masowe kategorii:</strong> Implementacja obsługi zdarzenia dwukliku (Double Click) na przyciskach branżowych (BHP, HVAC, Narzędzia) umożliwia błyskawiczne wczytanie całego zestawu sprzętu bez ręcznego klikania.</li>
+                <li><strong>Czysta kolumna L.p. na dokładce:</strong> Aby zachować pełną elastyczność i zgodność z procedurami kontroli, usunięto sztywną autonumerację ze Strony Dodatkowej. Pola L.p. są całkowicie czyste, dając brygadzie możliwość kontynuacji dowolnego ciągu cyfr.</li>
+            </ul>
+        </div>
+
+        <div class="section-card">
+            <h2>Etap 4: Nowy Standard Ergonomii Wizualnej (Interfejs Kafelkowy)</h2>
+            <p>Ostatnia faza projektu skupiła się na optymalizacji wizualnej interfejsu pod kątem ludzkich oczu, eliminując płaskie, zlewające się z tłem formularze na rzecz nowoczesnej struktury przestrzennej (Boxed UI):</p>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Element Interfejsu</th>
+                        <th>Wdrożone rozwiązanie graficzne i korzyść</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Nagłówki tabel roboczych</strong></td>
+                        <td>Głęboki, biznesowy odcień grafitu (<span class="badge" style="background-color: #334155; color: white;">#334155</span>). Nadaje powagi i ułatwia separację danych.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pola wejściowe (Inputs)</strong></td>
+                        <td>Śnieżnobiałe, zaokrąglone kafelki z delikatnym cieniem 3D, wybijające się z pastelowego tła komórek tabeli.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Wskaźnik zajętości wiersza</strong></td>
+                        <td>Dynamiczne wstrzykiwanie klasy <span class="badge badge-blue">.has-data</span>. Wiersz z tekstem zmienia tło, a tekst staje się pogrubiony.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <h2>Etap 5: Bezpieczeństwo i Restrykcje Technologiczne</h2>
+            <p>Podczas prac projektowych podjęto kluczowe, restrykcyjne decyzje architektoniczne, mające na celu ochronę danych wrażliwych pracowników (numery PESEL, dowody osobiste, numery rejestracyjne pojazdów):</p>
+            <ul>
+                <li><strong>Całkowity zakaz używania LocalStorage / SessionStorage:</strong> Dane nie mogą być keszowane w pamięci przeglądarki, co chroni informacje w przypadku pracy na losowych komputerach firmowych.</li>
+                <li><strong>Szyfrowany transfer lokalny (JSON):</strong> Przenoszenie, archiwizowanie i przywracanie stanów roboczych tabel odbywa się wyłącznie na żądanie użytkownika poprzez bezpieczne i jawne pliki konfiguracyjne JSON.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            Raport Końcowy Etapów Rozwoju Systemu Specyfikacji MM Kwidzyn &copy; 2026. Wersja Stabilna (Zintegrowana).
+        </div>
+
     </div>
 
 </body>

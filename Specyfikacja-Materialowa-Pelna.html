@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zintegrowany Generator Specyfikacji Materiałowej - MM Kwidzyn</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
+            --purple: #8b5cf6;
+            --purple-hover: #7c3aed;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --bg-app: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --border-color: #cbd5e1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- STYLIZACJA PASKA NAWIGACJI KART (CENTROWANY) --- */
+        .tab-navigation-bar {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            gap: 12px;
+            margin: 0 auto 15px auto;
+            background: var(--bg-card);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+
+        .tab-trigger-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            background-color: #f8fafc;
+            color: #475569;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-trigger-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .tab-trigger-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+
+        /* --- STYLE PANELU EKRANOWEGO (CENTROWANY) --- */
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin: 0 auto 30px auto;
+        }
+
+        .app-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .app-title { font-size: 22px; color: var(--primary); font-weight: 700; }
+        .app-subtitle { font-size: 14px; color: #64748b; margin-top: 5px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 12px 20px; font-size: 14px; font-weight: bold; border-radius: 6px;
+            cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 6px; color: white;
+        }
+
+        .btn-primary { background-color: var(--primary); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-purple { background-color: var(--purple); }
+        .btn-purple:hover { background-color: var(--purple-hover); }
+
+        .form-section { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 25px; }
+        .section-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 13px; font-weight: 600; color: #475569; }
+        .input-group input, .input-group select { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; outline: none; }
+
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        .form-group input { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; outline: none; }
+
+        .radio-group { display: flex; gap: 20px; align-items: center; height: 40px; }
+        .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; font-weight: 500; }
+
+        /* --- IMPLEMENTACJA AKCENTÓW Z PLIKU "ZRZUT EKRANU ŁADNY.JPG" --- */
+        .table-responsive-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .input-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        
+        /* Ciemny, elegancki nagłówek z "Zrzut ekranu ładny.jpg" */
+        .input-table th { 
+            background-color: #334155; 
+            color: #ffffff; 
+            font-size: 14px; 
+            font-weight: 700; 
+            padding: 12px 10px; 
+            border: 1px solid #475569; 
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Pastelowe, stonowane tło komórek, na którym wybijają się białe kafelki inputów */
+        .input-table td { 
+            padding: 8px 8px; 
+            border: 1px solid #e2e8f0; 
+            background-color: #f4f6f9; 
+            vertical-align: middle;
+            transition: background-color 0.2s;
+        }
+        
+        /* Przestrzenne, zaokrąglone kafelki wejściowe (efekt 3D/Boxed) */
+        .input-table input { 
+            width: 100%; 
+            padding: 8px 12px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px; 
+            font-size: 13.5px; 
+            font-weight: 500; 
+            color: #334155; 
+            background-color: #ffffff; 
+            outline: none;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.15s ease-in-out;
+        }
+
+        /* Rozświetlenie aktywnego kafelka */
+        .input-table input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+            background-color: #ffffff;
+        }
+
+        /* Dynamiczne zachowanie wiersza po uzupełnieniu danych */
+        .input-table tr.has-data td { background-color: #eaedf2 !important; }
+        .input-table tr.has-data td input { font-weight: 700; color: #000000; border-color: #94a3b8; }
+        
+        /* Szablony podpowiedzi tekstowych (Placeholder) */
+        .input-table input::placeholder { color: #94a3b8 !important; font-weight: 400 !important; font-style: italic; opacity: 1; }
+
+        .uwagi-container { display: flex; gap: 6px; align-items: center; width: 100%; }
+        
+        /* Ikona kosza dopasowana estetycznie do nowej głębi formularza */
+        .btn-row-clear { 
+            background: none; border: none; font-size: 15px; cursor: pointer; 
+            padding: 6px; border-radius: 4px; color: #94a3b8; transition: all 0.2s; 
+        }
+        .btn-row-clear:hover { background-color: #fee2e2; color: var(--danger); }
+
+        /* Elementy statyczne LP stylizowane na kafelki dla zachowania idealnego ładu oka */
+        .td-center { text-align: center; width: 60px; font-weight: bold; color: #334155; font-size: 14px; }
+        .td-jm { width: 80px; }
+        .td-qty { width: 90px; }
+        .empty-lp { color: #cbd5e1; font-weight: normal; font-style: italic; }
+
+        /* --- INTERFEJS SŁOWNIKA --- */
+        .package-bar {
+            display: flex; gap: 8px; margin-bottom: 15px; background-color: #f8fafc;
+            padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; flex-wrap: wrap; align-items: center;
+        }
+        .package-label { font-size: 13px; font-weight: 700; color: #334155; margin-right: 5px; text-transform: uppercase; }
+        .btn-pkg {
+            padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 20px;
+            background-color: #fff; color: #475569; border: 1px solid #cbd5e1; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-pkg:hover { border-color: #2563eb; color: #2563eb; }
+        .btn-pkg.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+
+        #print-template, #print-area { display: none; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .app-container { padding: 15px; }
+            .app-header { flex-direction: column; align-items: stretch; text-align: center; }
+            .header-actions { justify-content: center; }
+            .grid-3, .grid-2, .form-row { grid-template-columns: 1fr; flex-direction: column; gap: 15px; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        /* --- SFORMOWANA GEOMETRIA WYDRUKU PDF (NIENARUSZONA) --- */
+        @media print {
+            @page { size: A4 portrait; margin: 8mm 10mm 6mm 10mm; }
+            body { background: white; padding: 0; color: #000; display: block; }
+            .app-container, .no-print, .tab-navigation-bar { display: none !important; }
+            
+            body.show-print-glowna #print-template { display: block !important; width: 100%; font-family: Arial, sans-serif; background: white; }
+            body.show-print-glowna #print-area { display: none !important; }
+
+            body.show-print-dodatkowa #print-area { display: block !important; width: 100%; font-family: Arial, sans-serif; background: white; }
+            body.show-print-dodatkowa #print-template { display: none !important; }
+
+            .page-break-before { page-break-before: always; }
+            .print-page-flex-container { display: flex; flex-direction: column; justify-content: space-between; height: 258mm; box-sizing: border-box; }
+            .header-table-container { width: 100%; border: 1px solid #000; border-collapse: collapse; table-layout: fixed; }
+            .header-table-container td { border: 1px solid #000; padding: 5px; vertical-align: middle; text-align: center; font-size: 11px; font-weight: bold; }
+            .cell-company { width: 28%; font-size: 13px; text-align: center !important; }
+            .cell-middle-main { width: 52%; padding: 0 !important; }
+            .middle-top-text { border-bottom: 1px solid #000; padding: 5px; font-size: 11px; }
+            .middle-bottom-text { padding: 7px; font-size: 13px; }
+            .cell-right-main { width: 20%; padding: 0 !important; }
+            .right-top-text { border-bottom: 1px solid #000; padding: 4px; font-size: 11px; }
+            .right-bottom-split { display: flex; width: 100%; }
+            .split-left, .split-right { width: 50%; padding: 3px 0; }
+            .split-left { border-right: 1px solid #000; }
+            .sub-lbl { font-size: 9.5px; display: block; margin-bottom: 2px; }
+            .sub-val { font-size: 11px; font-weight: bold; }
+            .version-tag { text-align: right; font-size: 12px; font-weight: bold; margin-top: 2mm; margin-bottom: 4mm; }
+            .meta-input-section { width: 100%; margin-top: 2mm; }
+            .przepustka-row { text-align: right; font-size: 13px; margin-bottom: 5mm; padding-right: 5mm; }
+            .przepustka-subtext { font-size: 9px; display: block; margin-top: 1px; }
+            .wykonawca-data-block { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 6mm; }
+            .block-wykonawca { width: 63%; text-align: left; }
+            .block-data { width: 33%; text-align: right; }
+            .print-line-fill { font-weight: bold; font-size: 13px; border-bottom: 1px dashed #000; display: inline-block; padding-bottom: 1px; }
+            .label-under { font-size: 8.5px; display: block; margin-top: 2px; }
+            .doc-title-main { text-align: center; font-size: 16px; font-weight: bold; margin: 6mm 0 4mm 0; letter-spacing: 0.5px; }
+            .materials-table { width: 100%; border-collapse: collapse; margin-bottom: 2mm; }
+            .materials-table th { border: 1px solid #000; background: transparent; font-size: 10.5px; font-weight: bold; text-align: center; padding: 5px 3px; }
+            .materials-table td { border: 1px solid #000; padding: 4px 6px; font-size: 12px; height: 8.0mm; }
+            .center-text { text-align: center; }
+            .info-small { font-size: 9px; margin-bottom: 2mm; margin-top: 1mm; font-style: italic; }
+            .employee-box { margin-top: 2mm; font-size: 12.5px; line-height: 1.4; width: 100%; }
+            .employee-title { font-weight: bold; margin-bottom: 2mm; }
+            .employee-vertical-stack { display: flex; flex-direction: column; gap: 3mm; width: 100%; }
+            .fields-inline-row { display: flex; width: 100%; align-items: flex-end; }
+            .checkbox-container-print { display: flex; align-items: center; gap: 6px; padding-left: 2mm; }
+            .checkbox-box { display: inline-block; width: 13px; height: 13px; border: 1px solid #000; text-align: center; line-height: 11px; font-size: 10px; font-weight: bold; background: #fff; }
+            .sign-section-container { width: 100%; margin-top: 4mm; display: flex; justify-content: flex-end; }
+            .sign-space { text-align: center; width: 85mm; }
+            .sign-line { border-bottom: 1px dashed #000; height: 20px; width: 100%; }
+            .sign-desc { font-size: 8px; text-align: center; margin-top: 3px; line-height: 1.2; }
+            .clear { clear: both; }
+            .rodo-clause-box { border: 1px solid #000; padding: 6px 8px; font-size: 10.5px; font-weight: bold; text-align: justify; margin-top: 5mm; margin-bottom: 4mm; line-height: 1.35; }
+            .control-section-wrapper { display: flex; justify-content: space-between; width: 100%; margin-top: 2mm; }
+            .control-box-table { width: 48.5%; border: 1px solid #000; border-collapse: collapse; font-size: 11px; }
+            .control-box-table td { border: none !important; padding: 4px 6px !important; vertical-align: middle; height: auto !important; }
+            .control-box-title { font-weight: bold; font-size: 11px; padding-top: 5px !important; }
+            .control-box-sub-label { font-size: 7.5px; color: #000; display: block; margin-top: -1px; }
+            .control-box-sign-row { text-align: center; padding-top: 15px !important; padding-bottom: 2px !important; }
+            .control-box-sign-sub { font-size: 7.5px; display: block; text-align: center; margin-top: 1px; }
+            .footer-rules { font-size: 8px; margin-top: 4mm; line-height: 1.3; }
+            .footer-contact { border-top: 1.5px solid #000; margin-top: 3mm; padding-top: 3px; text-align: center; font-size: 10.5px; font-weight: bold; width: 100%; }
+            .meta-side-row { display: flex; justify-content: flex-end; width: 100%; font-size: 12px; margin-top: 4mm; margin-bottom: 4mm; padding-right: 5mm; }
+        }
+    </style>
+</head>
+<body class="show-print-glowna">
+
+    <!-- PASKA NAWIGACJI KART (ZAWSZE WYŚRODKOWANY) -->
+    <div class="tab-navigation-bar no-print">
+        <button id="tab-btn-glowna" class="tab-trigger-btn active" onclick="switchFormTab('glowna')">📋 Główna Specyfikacja</button>
+        <button id="tab-btn-dodatkowa" class="tab-trigger-btn" onclick="switchFormTab('dodatkowa')">📑 Strona Dodatkowa</button>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- WIDOK 1: GŁÓWNA SPEC                                    -->
+    <!-- ======================================================= -->
+    <div id="panel-form-glowna" style="width:100%; max-width:1000px; display:block;">
+        <div class="app-container">
+            <div class="app-header">
+                <div>
+                    <h1 class="app-title">Generator Specyfikacji Materiałowej</h1>
+                    <p class="app-subtitle">Zakład Produkcyjny MM Kwidzyn sp. z o.o. | Słownik Inteligentny (Live)</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="exportTemplateJSON()">💾 Zapisz szablon</button>
+                    <button class="btn btn-purple" onclick="document.getElementById('file-picker-json').click()">📂 Wczytaj szablon</button>
+                    <input type="file" id="file-picker-json" accept=".json" style="display: none;" onchange="importTemplateJSON(this)">
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ Generuj i Drukuj PDF</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">Informacje Ogólne i Przepustka</div>
+                <div class="grid-3">
+                    <div class="input-group">
+                        <label>Nazwa i miejscowość Wykonawcy / pieczęć:</label>
+                        <input type="text" id="form-wykonawca" value="HVAC Master Serwis">
+                    </div>
+                    <div class="input-group">
+                        <label>Kierunek ruchu materiałowego:</label>
+                        <div class="radio-group">
+                            <label class="radio-item"><input type="radio" name="kierunek" id="form-kierunek-wwoz" checked> wnoszący / wwożący</label>
+                            <label class="radio-item"><input type="radio" name="kierunek" id="form-kierunek-wywoz"> wynoszący / wywożący</label>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Data:</label>
+                        <input type="date" id="form-data">
+                    </div>
+                </div>
+                <div class="grid-3" style="margin-top: 15px;">
+                    <div class="input-group">
+                        <label>Przepustka nr (opcjonalnie):</label>
+                        <input type="text" id="form-przepustka" placeholder="Wpisz jeśli posiada">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">Dane Pracownika i Pojazdu</div>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="input-group">
+                        <label>Nazwisko i imię pracownika:</label>
+                        <input type="text" id="form-nazwisko" placeholder="Wpisz imię i nazwisko">
+                    </div>
+                    <div class="input-group">
+                        <label>PESEL (lub nr dokumentu tożsamości):</label>
+                        <input type="text" id="form-pesel" placeholder="Wpisz numer PESEL">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Marka pojazdu:</label>
+                        <input type="text" id="form-marka" placeholder="Np. Ford S-Max">
+                    </div>
+                    <div class="input-group">
+                        <label>Numer rejestracyjny pojazdu:</label>
+                        <input type="text" id="form-rejestracja" placeholder="Np. GKW 12345">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">Spis materiałów i narzędzi</div>
+                
+                <div class="package-bar no-print" id="category-selector-bar">
+                    <span class="package-label">Słownik (Klik: Filtr | Dwuklik: Wgraj):</span>
+                    <button type="button" class="btn-pkg active" data-kat="Wszystkie">✨ Wszystkie</button>
+                    <button type="button" class="btn-pkg" data-kat="Narzędzia ręczne">🛠️ Narzędzia ręczne</button>
+                    <button type="button" class="btn-pkg" data-kat="Narzędzia HVAC">❄️ Narzędzia HVAC</button>
+                    <button type="button" class="btn-pkg" data-kat="Elektronarzędzia">⚡ Elektronarzędzia</button>
+                    <button type="button" class="btn-pkg" data-kat="BHP">🦺 BHP</button>
+                    <button type="button" class="btn-pkg" data-kat="Materiały">📦 Materiały</button>
+                    <button type="button" class="btn-pkg" data-kat="Chemia HVAC">🧪 Chemia HVAC</button>
+                </div>
+
+                <div class="table-responsive-wrapper">
+                    <table class="input-table" id="input-table-data">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px; text-align: center;">Lp.</th>
+                                <th>Nazwa materiału / przedmiotu (Zacznij pisać...)</th>
+                                <th style="width: 100px; text-align: center;">J.m.</th>
+                                <th style="width: 110px; text-align: center;">Ilość</th>
+                                <th>Uwagi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- WIDOK 2: STRONA DODATKOWA                               -->
+    <!-- ======================================================= -->
+    <div id="panel-form-dodatkowa" style="width:100%; max-width:1000px; display:none;">
+        <div class="app-container">
+            <div class="app-header">
+                <div>
+                    <h1 class="app-title">Strona Dodatkowa Specyfikacji</h1>
+                    <p class="app-subtitle">Zakład Produkcyjny MM Kwidzyn sp. z o.o. | Kontynuacja specyfikacji</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="exportExtraTemplateJSON()">💾 Zapisz szablon</button>
+                    <button class="btn btn-purple" onclick="document.getElementById('file-picker-json-dod').click()">📂 Wczytaj szablon</button>
+                    <input type="file" id="file-picker-json-dod" accept=".json" style="display: none;" onchange="importExtraTemplateJSON(this)">
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ Wydruk dokładki</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Numer przepustki (jeśli znasz):</label>
+                        <input type="text" id="form-przepustka-dod" placeholder="Np. 123">
+                    </div>
+                    <div class="form-group">
+                        <label>Numer bieżącej strony:</label>
+                        <input type="text" id="form-nr-strony" value="3" style="text-align: center;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="table-responsive-wrapper">
+                    <table class="input-table" id="dynamic-input-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px; text-align: center;">Lp.</th>
+                                <th>Nazwa materiału / przedmiotu (marka, typ, nr seryjny)</th>
+                                <th style="width: 100px;">J.m.</th>
+                                <th style="width: 100px;">Ilość</th>
+                                <th>Uwagi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WSPÓLNY REJESTR PODPOWIEDZI -->
+    <datalist id="slownik-materialow"></datalist>
+
+    <!-- ======================================================= -->
+    <!-- STRUKTURA PDF 1: DRUK GŁÓWNY (3 STRONY)                 -->
+    <!-- ======================================================= -->
+    <div id="print-template">
+        <div class="print-page-flex-container">
+            <div>
+                <table class="header-table-container">
+                    <tr>
+                        <td class="cell-company">MM Kwidzyn sp. z o.o.</td>
+                        <td class="cell-middle-main">
+                            <div class="middle-top-text">Załącznik nr 12 do PO 02/01</div>
+                            <div class="middle-bottom-text">Specyfikacja materiałowa</div>
+                        </td>
+                        <td class="cell-right-main">
+                            <div class="right-top-text">Strona</div>
+                            <div class="right-bottom-split">
+                                <div class="split-left"><span class="sub-lbl">Liczba stron</span><span class="sub-val" id="total-pages-p1">2</span></div>
+                                <div class="split-right"><span class="sub-lbl">nr strony</span><span class="sub-val">1</span></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="version-tag">Wersja 1</div>
+                <div class="meta-input-section">
+                    <div class="przepustka-row">
+                        <strong>Przepustka nr</strong> <span class="print-line-fill" style="width: 35mm; text-align: center;" id="p1-print-przepustka">&nbsp;</span> <strong>/ 20 ...........</strong>
+                        <span class="przepustka-subtext">(wypełnia pracownik biura przepustek)</span>
+                    </div>
+                    <div class="wykonawca-data-block">
+                        <div class="block-wykonawca">
+                            <span class="print-line-fill" style="width: 100%; text-align: left;" id="p1-print-wykonawca">&nbsp;</span>
+                            <span class="label-under">(Nazwa i miejscowość Wykonawcy/ Podwykonawcy lub pieczęć)</span>
+                        </div>
+                        <div class="block-data">
+                            <strong>Data:</strong> <span class="print-line-fill" style="width: 70%; text-align: center;" id="p1-print-data">&nbsp;</span>
+                            <span class="label-under" style="text-align: center; width: 70%; margin-left: auto;">(DD-MM-RRRR)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="doc-title-main">SPECYFIKACJA MATERIAŁOWA</div>
+                <table class="materials-table">
+                    <thead><tr><th style="width: 10mm;">Lp.</th><th style="width: 115mm;">Nazwa materiału/ przedmiotu<br>(marka, typ, rodzaj, nr)</th><th style="width: 15mm;">J.m.</th><th style="width: 18mm;">Ilość</th><th style="width: 32mm;">Uwagi</th></tr></thead>
+                    <tbody id="p1-table-body"></tbody>
+                </table>
+                <div class="info-small">W przypadku braku miejsca wypełnij dodatkową stronę.</div>
+                <div class="employee-box">
+                    <div class="employee-title">Dane pracownika Wykonawcy lub jego podwykonawcy:</div>
+                    <div class="employee-vertical-stack">
+                        <div class="checkbox-container-print"><span class="checkbox-box" id="p1-check-wnos">&nbsp;</span> wnoszącego/wwożącego¹</div>
+                        <div class="checkbox-container-print"><span class="checkbox-box" id="p1-check-wynos">&nbsp;</span> wynoszącego/ wywożącego¹</div>
+                        <div class="fields-inline-row"><div>Nazwisko i imię:&nbsp;</div><div class="print-line-fill" style="flex-grow: 1;" id="p1-print-nazwisko">&nbsp;</div></div>
+                        <div class="fields-inline-row"><div>PESEL²:&nbsp;</div><div class="print-line-fill" style="flex-grow: 1;" id="p1-print-pesel">&nbsp;</div></div>
+                        <div class="fields-inline-row" style="margin-top: 1mm;">
+                            <div>Marka pojazdu:&nbsp;</div><div class="print-line-fill" style="width: 65mm;" id="p1-print-marka">&nbsp;</div>
+                            <div style="padding-left: 15px;">o numerze rejestracyjnym:&nbsp;</div><div class="print-line-fill" style="flex-grow: 1;" id="p1-print-rejestracja">&nbsp;</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sign-section-container"><div class="sign-space"><div class="sign-line"></div><div class="sign-desc">(czytelny podpis osoby przenoszącej / przewożącej materiały/ przedmioty³)</div></div></div>
+                <div class="clear"></div>
+                <div class="rodo-clause-box">* Potwierdzam zapoznanie się z „Klauzulą informacyjną o przetwarzaniu danych osobowych dla kontrahentów/ podwykonawców MM Kwidzyn sp. z o.o.”, udostępnioną w biurze przepustek bramy głównej zakładu oraz dostępną do pobrania na stronie internetowej MM Kwidzyn sp. z o.o. https://kwidzyn-download.com/inne.html</div>
+                <div class="control-section-wrapper">
+                    <table class="control-box-table"><tr><td class="control-box-title">Kontrole wniesienia / wwozu¹:</td></tr><tr><td>Przeprowadził(a) dnia ......................... godz. ..............</td></tr><tr><td><span class="control-box-sub-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(DD-MM-RRRR) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(HH:MM)</span></td></tr><tr><td>W sumie pozycji: ..........</td></tr><tr><td class="control-box-sign-row">Pracownik ochrony ....................................................</td></tr><tr><td><span class="control-box-sign-sub">(czytelny podpis)</span></td></tr></table>
+                    <table class="control-box-table"><tr><td class="control-box-title">Kontrolę wyniesienia / wywozu¹:</td></tr><tr><td>Przeprowadził(a) dnia ......................... godz. ..............</td></tr><tr><td><span class="control-box-sub-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(DD-MM-RRRR) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(HH:MM)</span></td></tr><tr><td>W sumie pozycji: ..........</td></tr><tr><td class="control-box-sign-row">Pracownik ochrony ....................................................</td></tr><tr><td><span class="control-box-sign-sub">(czytelny podpis)</span></td></tr></table>
+                </div>
+                <div class="footer-rules">1 Niepotrzebne skreślić. &nbsp;&nbsp; 2 W przypadku nieposiadania PESEL wpisać serię i nr dokumentu tożsamości.<br>3 Potwierdzam, że zostałem zapoznany z przepisami porządkowymi oraz zasadami bezpieczeństwa i higieny pracy obowiązującymi na terenie zakładu MM Kwidzyn sp. z o.o.</div>
+            </div>
+            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telefon: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
+        </div>
+
+        <div id="print-page-2-area" class="page-break-before print-page-flex-container">
+            <div>
+                <table class="header-table-container"><tr><td class="cell-company">MM Kwidzyn sp. z o.o.</td><td class="cell-middle-main"><div class="middle-top-text">Załącznik nr 12 do PO 02/01</div><div class="middle-bottom-text">Specyfikacja materiałowa</div></td><td class="cell-right-main"><div class="right-top-text">Strona</div><div class="right-bottom-split"><div class="split-left"><span class="sub-lbl">Liczba stron</span><span class="sub-val" id="total-pages-p2">2</span></div><div class="split-right"><span class="sub-lbl">nr strony</span><span class="sub-val">2</span></div></div></td></tr></table>
+                <div class="version-tag">Wersja 1</div>
+                <div style="margin-top: 4mm;"><table class="materials-table"><thead><tr><th style="width: 10mm;">Lp.</th><th style="width: 115mm;">Nazwa materiału/ przedmiotu<br>(marka, typ, rodzaj, nr)</th><th style="width: 15mm;">J.m.</th><th style="width: 18mm;">Ilość</th><th style="width: 32mm;">Uwagi</th></tr></thead><tbody id="p2-table-body"></tbody></table></div>
+                <div class="info-small">W przypadku braku miejsca wypełnij dodatkową stronę.</div>
+            </div>
+            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telefon: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
+        </div>
+
+        <div id="print-page-3-area" class="page-break-before print-page-flex-container" style="padding-top: 5mm; height: 258mm;">
+            <div>
+                <table class="header-table-container"><tr><td class="cell-company" style="font-size: 12px; width: 35%; text-align: left !important;">MM Kwidzyn sp. z o.o.</td><td class="cell-middle-main" style="width: 45%;"><div class="middle-top-text" style="font-size: 13px; margin-bottom: 2px;">Załącznik nr 12 do PO 02/01</div><div class="middle-bottom-text" style="font-size: 13px; font-weight: bold;">Specyfikacja materiałowa</div></td><td class="cell-right-main" style="width: 20%;"><div style="padding: 15px 0; font-weight: bold; font-size: 11px;">Strona<span class="meta-side-val" style="font-size:14px; margin-top:5px; display:block;">3</span></div></td></tr></table>
+                <div class="meta-side-row"><div><strong>Przepustka nr</strong> <span class="print-line-fill" style="width: 35mm; text-align: center;" id="p3-print-przepustka">&nbsp;</span> <strong>/ 20 ...........</strong><span style="font-size: 10px; display: block; text-align: right; margin-top: 2px; font-weight: normal; color: #000;">(wypełnia pracownik biura przepustek)</span></div></div>
+                <table class="materials-table"><thead><tr><th style="width: 10mm;">Lp.</th><th style="width: 115mm;">Nazwa materiału/ przedmiotu<br>(marka, typ, rodzaj, nr)</th><th style="width: 15mm;">J.m.</th><th style="width: 18mm;">Ilość</th><th style="width: 32mm;">Uwagi</th></tr></thead><tbody id="p3-table-body"></tbody></table>
+                <div class="info-small">W przypadku braku miejsca wypełnij dodatkową stronę.</div>
+            </div>
+            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telefon: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
+        </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- STRUKTURA PDF 2: DRUK DOKŁADKI (STRONA DODATKOWA)       -->
+    <!-- ======================================================= -->
+    <div id="print-area">
+        <div class="print-page-flex-container">
+            <table class="header-table-container">
+                <tr>
+                    <td class="cell-company">MM Kwidzyn sp. z o.o.</td>
+                    <td style="width: 45%;">
+                        <div style="border-bottom: 1px solid #000; padding-bottom: 4px;">Załącznik nr 12a do PO 02/01</div>
+                        <div style="padding-top: 4px; text-transform: uppercase;">Specyfikacja materiałowa - strona dodatkowa</div>
+                    </td>
+                    <td style="width: 20%; padding: 0 !important;">
+                        <div style="border-bottom: 1px solid #000; padding: 4px;">Strona</div>
+                        <div style="font-size: 14px; padding: 4px;" id="print-dod-strona">3</div>
+                    </td>
+                </tr>
+            </table>
+            <div class="meta-input-section">
+                <div><strong>Przepustka nr</strong> <span class="print-line-fill" style="width: 35mm; text-align: center;" id="print-dod-przepustka">&nbsp;</span> <strong>/ 20 ...........</strong></div>
+            </div>
+            <table class="materials-table">
+                <thead><tr><th style="width: 12mm;">Lp.</th><th style="width: 113mm;">Nazwa materiału/ przedmiotu</th><th style="width: 15mm;">J.m.</th><th style="width: 18mm;">Ilość</th><th style="width: 32mm;">Uwagi</th></tr></thead>
+                <tbody id="print-dod-table-body"></tbody>
+            </table>
+            <div style="font-size: 10px; margin-top: 3mm; font-style: italic;">W przypadku braku miejsca wypełnij kolejną dodatkową stronę.</div>
+            <div class="footer-contact">Ochrona zakładu - biuro przepustek: telefon: (55) 610 8045; Email: biuroprzepustek.kwidzyn@mm.group</div>
+        </div>
+    </div>
+
+    <!-- SŁOWNIK BRANŻOWY -->
+    <script src="baza_materialow.js"></script>
+
+    <!-- LOGIKA JAVASCRIPT -->
+    <script>
+        let STAN_AKTYWNEJ_KARTY = "glowna";
+        let AKTUALNIE_AKTYWNA_KATEGORIA = "Wszystkie";
+
+        function pobierzBazeSlownika() {
+            if (typeof MOJA_BAZA_MATERIALOW !== 'undefined' && Array.isArray(MOJA_BAZA_MATERIALOW)) {
+                return MOJA_BAZA_MATERIALOW;
+            }
+            if (window.MOJA_BAZA_MATERIALOW && Array.isArray(window.MOJA_BAZA_MATERIALOW)) {
+                return window.MOJA_BAZA_MATERIALOW;
+            }
+            return [];
+        }
+
+        function switchFormTab(target) {
+            STAN_AKTYWNEJ_KARTY = target;
+            if (target === "glowna") {
+                document.getElementById('panel-form-glowna').style.display = "block";
+                document.getElementById('panel-form-dodatkowa').style.display = "none";
+                document.getElementById('tab-btn-glowna').classList.add('active');
+                document.getElementById('tab-btn-dodatkowa').classList.remove('active');
+                document.body.className = "show-print-glowna";
+            } else {
+                document.getElementById('panel-form-glowna').style.display = "none";
+                document.getElementById('panel-form-dodatkowa').style.display = "block";
+                document.getElementById('tab-btn-glowna').classList.remove('active');
+                document.getElementById('tab-btn-dodatkowa').classList.add('active');
+                document.body.className = "show-print-dodatkowa";
+            }
+            przebudujDatalistPodKategorie();
+        }
+
+        function przywrocOrazOdswiezSlownik() {
+            przebudujDatalistPodKategorie();
+        }
+
+        function przeliczaZmianeWierszaDod(index) {
+            const lp = document.getElementById(`dod-input-lp-${index}`).value.trim();
+            const nazwa = document.getElementById(`dod-input-nazwa-${index}`).value.trim();
+            const jm = document.getElementById(`dod-input-jm-${index}`).value.trim();
+            const qty = document.getElementById(`dod-input-qty-${index}`).value.trim();
+            const uwagi = document.getElementById(`dod-input-uwagi-${index}`).value.trim();
+            const wierszTr = document.getElementById(`dod-row-tr-${index}`);
+            
+            if (lp !== "" || nazwa !== "" || jm !== "" || qty !== "" || uwagi !== "") {
+                wierszTr.classList.add('has-data');
+            } else { wierszTr.classList.remove('has-data'); }
+            przebudujDatalistPodKategorie();
+        }
+
+        function przebudujDatalistPodKategorie() {
+            const datalist = document.getElementById('slownik-materialow');
+            if (!datalist) return;
+            datalist.innerHTML = ""; 
+
+            const baza = pobierzBazeSlownika();
+            if (baza.length === 0) return;
+
+            let aktualnieUzyteNazwy = [];
+            
+            for (let i = 1; i <= 55; i++) {
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() !== "") {
+                    aktualnieUzyteNazwy.push(poleNazwa.value.trim().toLowerCase());
+                }
+            }
+            for (let i = 1; i <= 25; i++) {
+                const poleNazwa = document.getElementById(`dod-input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() !== "") {
+                    aktualnieUzyteNazwy.push(poleNazwa.value.trim().toLowerCase());
+                }
+            }
+
+            baza.forEach(item => {
+                if (!item || !item.name) return;
+                const katPrzedmiotu = item.kat ? item.kat.trim() : "Wszystkie";
+                const oczyszczonaNazwaSłownika = item.name.trim();
+                
+                const pasujeKategoria = (STAN_AKTYWNEJ_KARTY === "dodatkowa") || 
+                                        (AKTUALNIE_AKTYWNA_KATEGORIA === "Wszystkie" || katPrzedmiotu === AKTUALNIE_AKTYWNA_KATEGORIA);
+
+                if (pasujeKategoria && !aktualnieUzyteNazwy.includes(oczyszczonaNazwaSłownika.toLowerCase())) {
+                    const option = document.createElement('option');
+                    option.value = oczyszczonaNazwaSłownika;
+                    datalist.appendChild(option);
+                }
+            });
+        }
+
+        // =======================================================
+        // GENEROWANIE WIERSZY: GŁÓWNA SPEC
+        // =======================================================
+        document.getElementById('form-data').valueAsDate = new Date();
+        const tbodyInputGlowna = document.querySelector('#input-table-data tbody');
+
+        document.querySelectorAll('.btn-pkg').forEach(btn => {
+            let clickTimer = null;
+            btn.addEventListener('click', function() {
+                if (clickTimer) clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    document.querySelectorAll('.btn-pkg').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    AKTUALNIE_AKTYWNA_KATEGORIA = btn.getAttribute('data-kat').trim();
+                    przebudujDatalistPodKategorie();
+                }, 250);
+            });
+            btn.addEventListener('dblclick', function() {
+                if (clickTimer) clearTimeout(clickTimer);
+                document.querySelectorAll('.btn-pkg').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                AKTUALNIE_AKTYWNA_KATEGORIA = btn.getAttribute('data-kat').trim();
+                wczytajMaseSprzetuZFilmu(AKTUALNIE_AKTYWNA_KATEGORIA);
+            });
+        });
+
+        for (let i = 1; i <= 30; i++) { createMainRow(i, i); }
+        for (let i = 31; i <= 55; i++) { createMainRow(i, ""); }
+
+        function createMainRow(index, visibleLp) {
+            const tr = document.createElement('tr');
+            tr.id = `row-tr-${index}`;
+            tr.innerHTML = `
+                <td class="td-center ${visibleLp === "" ? 'empty-lp' : ''}" id="lp-cell-${index}">${visibleLp === "" ? "—" : visibleLp}</td>
+                <td><input type="text" id="input-nazwa-${index}" list="slownik-materialow" placeholder="${index >= 31 ? 'Kliknij, aby aktywować...' : 'Wpisz przedmiot...'}" onfocus="activateRow(${index}); przywrocOrazOdswiezSlownik()" oninput="autoFillUwagi(${index}); obslugaZmianyInputu(${index})"></td>
+                <td class="td-jm"><input type="text" id="input-jm-${index}" placeholder="szt." style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
+                <td class="td-qty"><input type="text" id="input-qty-${index}" placeholder="1" style="text-align: center;" oninput="obslugaZmianyInputu(${index})"></td>
+                <td>
+                    <div class="uwagi-container">
+                        <input type="text" id="input-uwagi-${index}" style="flex-grow: 1;" oninput="obslugaZmianyInputu(${index})">
+                        <button type="button" class="btn-row-clear no-print" onclick="clearRowData(${index})" title="Wyczyść pozycję">🗑️</button>
+                    </div>
+                </td>
+            `;
+            tbodyInputGlowna.appendChild(tr);
+        }
+
+        function obslugaZmianyInputu(index) {
+            const nazwa = document.getElementById(`input-nazwa-${index}`).value.trim();
+            const jm = document.getElementById(`input-jm-${index}`).value.trim();
+            const qty = document.getElementById(`input-qty-${index}`).value.trim();
+            const uwagi = document.getElementById(`input-uwagi-${index}`).value.trim();
+            const wierszTr = document.getElementById(`row-tr-${index}`);
+            
+            if (nazwa !== "" || jm !== "" || qty !== "" || uwagi !== "") {
+                wierszTr.classList.add('has-data');
+            } else { wierszTr.classList.remove('has-data'); }
+            przebudujDatalistPodKategorie();
+        }
+
+        function autoFillUwagi(index) {
+            const typedName = document.getElementById(`input-nazwa-${index}`).value.trim();
+            const uwagiField = document.getElementById(`input-uwagi-${index}`);
+            const baza = pobierzBazeSlownika();
+            const foundItem = baza.find(item => item && item.name.trim() === typedName);
+            if (foundItem) { uwagiField.value = foundItem.uwagi; }
+        }
+
+        function activateRow(index) {
+            if (index >= 31) {
+                const lpCell = document.getElementById('lp-cell-' + index);
+                if (lpCell && lpCell.innerText === "—") { lpCell.innerText = index; lpCell.classList.remove('empty-lp'); }
+            }
+        }
+
+        function clearRowData(index) {
+            document.getElementById(`input-nazwa-${index}`).value = "";
+            document.getElementById(`input-jm-${index}`).value = "";
+            document.getElementById(`input-qty-${index}`).value = "";
+            document.getElementById(`input-uwagi-${index}`).value = "";
+            const wierszTr = document.getElementById(`row-tr-${index}`);
+            wierszTr.classList.remove('has-data');
+            if (index >= 31) {
+                const lpCell = document.getElementById('lp-cell-' + index);
+                if (lpCell) { lpCell.innerText = "—"; lpCell.classList.add('empty-lp'); }
+            }
+            przebudujDatalistPodKategorie();
+        }
+
+        function wczytajMaseSprzetuZFilmu(wybranaKategoria) {
+            const baza = pobierzBazeSlownika();
+            if (baza.length === 0) return;
+            const czystyFiltr = wybranaKategoria.trim();
+            let przefiltrowanePrzedmioty = [];
+            
+            baza.forEach(item => {
+                const katPrzedmiotu = item.kat ? item.kat.trim() : "Wszystkie";
+                if (czystyFiltr === 'Wszystkie' || katPrzedmiotu === czystyFiltr) { przefiltrowanePrzedmioty.push(item); }
+            });
+
+            let aktualnieWpisane = [];
+            for (let i = 1; i <= 55; i++) {
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                if (poleNazwa && poleNazwa.value.trim() !== "") { aktualnieWpisane.push(poleNazwa.value.trim().toLowerCase()); }
+            }
+
+            let licznikPrzedmiotow = 0;
+            for (let i = 1; i <= 55; i++) {
+                if (licznikPrzedmiotow >= przefiltrowanePrzedmioty.length) break;
+                const poleNazwa = document.getElementById(`input-nazwa-${i}`);
+                const poleUwagi = document.getElementById(`input-uwagi-${i}`);
+
+                if (poleNazwa && poleNazwa.value.trim() === "") {
+                    while (licznikPrzedmiotow < przefiltrowanePrzedmioty.length) {
+                        const kandydat = przefiltrowanePrzedmioty[licznikPrzedmiotow];
+                        if (!aktualnieWpisane.includes(kandydat.name.trim().toLowerCase())) {
+                            if (i >= 31) { activateRow(i); }
+                            poleNazwa.value = kandydat.name.trim();
+                            if (poleUwagi) { poleUwagi.value = kandydat.uwagi.trim(); }
+                            document.getElementById(`row-tr-${i}`).classList.add('has-data');
+                            aktualnieWpisane.push(kandydat.name.trim().toLowerCase());
+                            licznikPrzedmiotow++;
+                            break;
+                        }
+                        licznikPrzedmiotow++;
+                    }
+                }
+            }
+            przebudujDatalistPodKategorie();
+        }
+
+        function exportTemplateJSON() {
+            let data = {
+                przepustka: document.getElementById('form-przepustka').value,
+                wykonawca: document.getElementById('form-wykonawca').value,
+                data: document.getElementById('form-data').value,
+                kierunek: document.getElementById('form-kierunek-wwoz').checked ? 'wwoz' : 'wywoz',
+                nazwisko: document.getElementById('form-nazwisko').value,
+                pesel: document.getElementById('form-pesel').value,
+                marka: document.getElementById('form-marka').value,
+                rejestracja: document.getElementById('form-rejestracja').value,
+                items: []
+            };
+            for (let i = 1; i <= 55; i++) {
+                data.items.push({
+                    lp_text: document.getElementById(`lp-cell-${i}`).innerText,
+                    nazwa: document.getElementById(`input-nazwa-${i}`).value,
+                    jm: document.getElementById(`input-jm-${i}`).value,
+                    qty: document.getElementById(`input-qty-${i}`).value,
+                    uwagi: document.getElementById(`input-uwagi-${i}`).value
+                });
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `Kopia_Specyfikacji_MM_${data.nazwisko || 'HVAC'}.json`; a.click();
+        }
+
+        function importTemplateJSON(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    document.getElementById('form-przepustka').value = data.przepustka || '';
+                    document.getElementById('form-wykonawca').value = data.wykonawca || '';
+                    document.getElementById('form-data').value = data.data || '';
+                    document.getElementById('form-nazwisko').value = data.nazwisko || '';
+                    document.getElementById('form-pesel').value = data.pesel || '';
+                    document.getElementById('form-marka').value = data.marka || '';
+                    document.getElementById('form-rejestracja').value = data.rejestracja || '';
+                    if (data.kierunek === 'wywoz') { document.getElementById('form-kierunek-wywoz').checked = true; }
+                    else { document.getElementById('form-kierunek-wwoz').checked = true; }
+                    data.items.forEach((item, index) => {
+                        let i = index + 1;
+                        if(i <= 55) {
+                            if (item.lp_text !== "—" && i >= 31) { activateRow(i); }
+                            document.getElementById(`input-nazwa-${i}`).value = item.nazwa || '';
+                            document.getElementById(`input-jm-${i}`).value = item.jm || '';
+                            document.getElementById(`input-qty-${i}`).value = item.qty || '';
+                            document.getElementById(`input-uwagi-${i}`).value = item.uwagi || '';
+                            if ((item.nazwa && item.nazwa.trim() !== "") || (item.uwagi && item.uwagi.trim() !== "")) {
+                                document.getElementById(`row-tr-${i}`).classList.add('has-data');
+                            }
+                        }
+                    });
+                    przebudujDatalistPodKategorie();
+                    alert("🟢 Kopia zapasowa danych zaimportowana pomyślnie!");
+                } catch(err) { alert("❌ Błąd pliku JSON."); }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+
+        // =======================================================
+        // GENEROWANIE WIERSZY: STRONA DODATKOWA (CZYSTE LP)
+        // =======================================================
+        const tbodyInputDodatkowa = document.querySelector('#dynamic-input-table tbody');
+
+        for (let i = 1; i <= 25; i++) {
+            const tr = document.createElement('tr');
+            tr.id = `dod-row-tr-${i}`;
+            tr.innerHTML = `
+                <td><input type="text" style="text-align:center; font-weight:bold;" id="dod-input-lp-${i}" value="" placeholder="—" oninput="przeliczaZmianeWierszaDod(${i})"></td>
+                <td><input type="text" id="dod-input-nazwa-${i}" placeholder="Wpisz przedmiot..." list="slownik-materialow" onfocus="przywrocOrazOdswiezSlownik()" oninput="przeliczaZmianeWierszaDod(${i})"></td>
+                <td><input type="text" id="dod-input-jm-${i}" placeholder="szt." style="text-align:center;" oninput="przeliczaZmianeWierszaDod(${i})"></td>
+                <td><input type="text" id="dod-input-qty-${i}" placeholder="1" style="text-align:center;" oninput="przeliczaZmianeWierszaDod(${i})"></td>
+                <td>
+                    <div class="uwagi-container">
+                        <input type="text" id="dod-input-uwagi-${i}" style="flex-grow: 1;" oninput="przeliczaZmianeWierszaDod(${i})">
+                        <button type="button" class="btn-row-clear no-print" onclick="clearRowDataDod(${i})" title="Wyczyść pozycję">🗑️</button>
+                    </div>
+                </td>
+            `;
+            tbodyInputDodatkowa.appendChild(tr);
+
+            document.getElementById(`dod-input-nazwa-${i}`).addEventListener('input', function(e) {
+                const baza = pobierzBazeSlownika();
+                const wybrano = baza.find(x => x && x.name === e.target.value.trim());
+                if (wybrano && wybrano.uwagi) {
+                    const uwagiField = document.getElementById(`dod-input-uwagi-${i}`);
+                    if (!uwagiField.value) { uwagiField.value = wybrano.uwagi; }
+                }
+            });
+        }
+
+        function clearRowDataDod(index) {
+            document.getElementById(`dod-input-lp-${index}`).value = "";
+            document.getElementById(`dod-input-nazwa-${index}`).value = "";
+            document.getElementById(`dod-input-jm-${index}`).value = "";
+            document.getElementById(`dod-input-qty-${index}`).value = "";
+            document.getElementById(`dod-input-uwagi-${index}`).value = "";
+            document.getElementById(`dod-row-tr-${index}`).classList.remove('has-data');
+            przebudujDatalistPodKategorie();
+        }
+
+        function exportExtraTemplateJSON() {
+            let data = { przepustka: document.getElementById('form-przepustka-dod').value, nr_strony: document.getElementById('form-nr-strony').value, items: [] };
+            for (let i = 1; i <= 25; i++) {
+                data.items.push({
+                    lp: document.getElementById(`dod-input-lp-${i}`).value,
+                    nazwa: document.getElementById(`dod-input-nazwa-${i}`).value,
+                    jm: document.getElementById(`dod-input-jm-${i}`).value,
+                    qty: document.getElementById(`dod-input-qty-${i}`).value,
+                    uwagi: document.getElementById(`dod-input-uwagi-${i}`).value
+                });
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `Szablon_Dokladki_Strona_${data.nr_strony || '3'}.json`; a.click();
+        }
+
+        function importExtraTemplateJSON(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    document.getElementById('form-przepustka-dod').value = data.przepustka || '';
+                    document.getElementById('form-nr-strony').value = data.nr_strony || '3';
+                    data.items.forEach((item, index) => {
+                        let i = index + 1;
+                        if(i <= 25) {
+                            document.getElementById(`dod-input-lp-${i}`).value = item.lp || '';
+                            document.getElementById(`dod-input-nazwa-${i}`).value = item.nazwa || '';
+                            document.getElementById(`dod-input-jm-${i}`).value = item.jm || '';
+                            document.getElementById(`dod-input-qty-${i}`).value = item.qty || '';
+                            document.getElementById(`dod-input-uwagi-${i}`).value = item.uwagi || '';
+                            if (item.lp || item.nazwa || item.jm || item.qty || item.uwagi) {
+                                document.getElementById(`dod-row-tr-${i}`).classList.add('has-data');
+                            }
+                        }
+                    });
+                    przebudujDatalistPodKategorie();
+                    alert("🟢 Szablon dokładki zaimportowany!");
+                } catch(err) { alert("❌ Błąd pliku JSON."); }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // =======================================================
+        // PRZYGOTOWANIE DRUKU DLA SILNIKA PDF
+        // =======================================================
+        window.onbeforeprint = function() {
+            if (STAN_AKTYWNEJ_KARTY === "glowna") {
+                document.getElementById('p1-print-wykonawca').innerText = document.getElementById('form-wykonawca').value;
+                const nrPrzepustki = document.getElementById('form-przepustka').value.trim();
+                const pkaText = nrPrzepustki ? `&nbsp;${nrPrzepustki}&nbsp;` : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                document.getElementById('p1-print-przepustka').innerHTML = pkaText;
+                document.getElementById('p3-print-przepustka').innerHTML = pkaText;
+                
+                const rawDate = document.getElementById('form-data').value;
+                if (rawDate) {
+                    const parts = rawDate.split('-');
+                    document.getElementById('p1-print-data').innerText = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : rawDate;
+                }
+                document.getElementById('p1-check-wnos').innerText = document.getElementById('form-kierunek-wwoz').checked ? "X" : " ";
+                document.getElementById('p1-check-wynos').innerText = document.getElementById('form-kierunek-wywoz').checked ? "X" : " ";
+                document.getElementById('p1-print-nazwisko').innerText = document.getElementById('form-nazwisko').value;
+                document.getElementById('p1-print-pesel').innerText = document.getElementById('form-pesel').value;
+                document.getElementById('p1-print-marka').innerText = document.getElementById('form-marka').value;
+                document.getElementById('p1-print-rejestracja').innerText = document.getElementById('form-rejestracja').value;
+
+                let hasPage2Data = false; for(let i=6; i<=30; i++) { if(document.getElementById(`input-nazwa-${i}`).value.trim() !== "") { hasPage2Data = true; break; } }
+                let hasPage3Data = false; for(let i=31; i<=55; i++) { if(document.getElementById(`input-nazwa-${i}`).value.trim() !== "") { hasPage3Data = true; break; } }
+                let totalPages = hasPage3Data ? 3 : (hasPage2Data ? 2 : 1);
+
+                document.getElementById('total-pages-p1').innerText = totalPages;
+                document.getElementById('total-pages-p2').innerText = totalPages;
+                document.getElementById('print-page-2-area').style.display = hasPage2Data ? 'block' : 'none';
+                document.getElementById('print-page-3-area').style.display = hasPage3Data ? 'block' : 'none';
+
+                document.getElementById('p1-table-body').innerHTML = "";
+                for(let i=1; i<=5; i++) { document.getElementById('p1-table-body').innerHTML += generatePrintRow(i); }
+                document.getElementById('p2-table-body').innerHTML = "";
+                if (hasPage2Data) { for(let i=6; i<=30; i++) { document.getElementById('p2-table-body').innerHTML += generatePrintRow(i); } }
+                document.getElementById('p3-table-body').innerHTML = "";
+                if (hasPage3Data) { for(let i=31; i<=55; i++) { document.getElementById('p3-table-body').innerHTML += generatePrintRow(i); } }
+
+            } else {
+                const nrPrzepustkiDod = document.getElementById('form-przepustka-dod').value.trim();
+                document.getElementById('print-dod-przepustka').innerHTML = nrPrzepustkiDod ? `&nbsp;${nrPrzepustkiDod}&nbsp;` : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                document.getElementById('print-dod-strona').innerText = document.getElementById('form-nr-strony').value || '3';
+
+                let tableHtml = "";
+                for (let i = 1; i <= 25; i++) {
+                    const lp = document.getElementById(`dod-input-lp-${i}`).value;
+                    const nazwa = document.getElementById(`dod-input-nazwa-${i}`).value;
+                    let jm = "", qty = "", uwagi = "";
+                    if(lp.trim() !== "" || nazwa.trim() !== "") {
+                        jm = document.getElementById(`dod-input-jm-${i}`).value.trim() || "szt.";
+                        qty = document.getElementById(`dod-input-qty-${i}`).value.trim() || "1";
+                        uwagi = document.getElementById(`dod-input-uwagi-${i}`).value;
+                    }
+                    tableHtml += `<tr><td class="center-text">${lp}</td><td>${nazwa}</td><td class="center-text">${jm}</td><td class="center-text">${qty}</td><td>${uwagi}</td></tr>`;
+                }
+                document.getElementById('print-dod-table-body').innerHTML = tableHtml;
+            }
+        };
+
+        function generatePrintRow(i) {
+            const lpVal = document.getElementById(`lp-cell-${i}`).innerText.trim();
+            const lpDisplay = (lpVal !== "—" && lpVal !== "") ? lpVal : i;
+            const nazwaValue = document.getElementById(`input-nazwa-${i}`).value.trim();
+            let jmDisplay = "", qtyDisplay = "", uwagiDisplay = "";
+
+            if (nazwaValue !== "") {
+                const jmInput = document.getElementById(`input-jm-${i}`);
+                jmDisplay = jmInput.value.trim() || jmInput.getAttribute("placeholder") || "szt.";
+                qtyDisplay = document.getElementById(`input-qty-${i}`).value.trim() || "1";
+                uwagiDisplay = document.getElementById(`input-uwagi-${i}`).value;
+            }
+            return `<tr><td class="center-text">${lpDisplay}</td><td>${nazwaValue}</td><td class="center-text">${jmDisplay}</td><td class="center-text">${qtyDisplay}</td><td>${uwagiDisplay}</td></tr>`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            przebudujDatalistPodKategorie();
+        });
+    </script>
+</body>
+</html>
